@@ -5,7 +5,7 @@ const express = require('express');
 const apiRouter = express.Router();
 
 //Mounts the envelopesRouter
-const envelopesRouter = require('./envelopes-router.js');
+const envelopesRouter = require('./routers/envelopes-router.js');
 apiRouter.use('/envelopes', envelopesRouter)
 
 //Exports the router
