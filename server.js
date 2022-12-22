@@ -10,7 +10,7 @@ const app = express();
 //Remove after development to minimize unnecessary realtime logs on server
 app.use(morgan('tiny'));
 
-//Security Middleware
+//Security measures
 app.use(helmet());
 app.disable('x-powered-by');
 
