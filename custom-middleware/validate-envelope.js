@@ -5,7 +5,7 @@ const validateEnvelope = (req, res, next) => {
         if(typeof(req.body.budget) === 'number' && typeof(req.body.category) === 'string'){
             next();
         }else{
-            res.status(400).send({message: "Incorrect envelope format"});
+            res.status(400).send({message: 'Incorrect envelope format'});
         }
     } catch(err){
        res.status(500).send(err);
