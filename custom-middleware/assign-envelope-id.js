@@ -9,8 +9,8 @@ const assignEnvelopeId = (req, res, next) => {
             newId = 1;
         }else{
             newId = envelopes[envelopes.length - 1].id + 1;
-            req.body.id = newId;
         }
+        req.body.id = newId;
         next();
     }catch(err){
         res.status(500).send(err);
