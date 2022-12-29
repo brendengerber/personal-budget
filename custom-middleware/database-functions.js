@@ -1,7 +1,15 @@
-//Checks if a specific envelope exists and calls next if so
-
 //Imports envelopes
 const envelopes = require('../envelopes.js');
+
+//Adds an envelope
+const addEnvelope = (req, res, next) => {
+    try{
+        envelopes.push(req.body);
+        next();
+    }catch (err){
+        res.status(500).send(err)
+    }
+};
 
 //Finds a certain envelope by ID and attatches it to the req object
 const findEnvelopeById = (req, res, next) => {
@@ -17,3 +25,18 @@ const findEnvelopeById = (req, res, next) => {
         res.status(500).send(err)
     }
 }
+
+const deleteEnvelopeById = (req, res, next) => {
+
+}
+
+const replaceEnvelopeById = (req, res, next) => {
+    
+}
+
+module.exports = {
+    addEnvelope,
+    findEnvelopeById,
+    deleteEnvelopeById,
+    replaceEnvelopeById
+};
