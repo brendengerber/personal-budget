@@ -1,9 +1,9 @@
 //Imports necessary modules
 const express = require('express');
 const envelopes = require('../envelopes.js');
-const { validateEnvelope, validateId} = require('../custom-middleware/validation-functions.js')
+const {validateEnvelope, validateId} = require('../custom-middleware/validation-functions.js')
 const assignEnvelopeId = require('../custom-middleware/assign-envelope-Id.js');
-const addEnvelope = require('../custom-middleware/add-envelope.js');
+const {addEnvelope, findEnvelopeById, deleteEnvelopeById, replaceEnvelopeById} = require('../custom-middleware/database-functions.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
