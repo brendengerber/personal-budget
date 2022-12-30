@@ -7,22 +7,22 @@ const addEnvelope = (req, res, next) => {
         envelopes.push(req.envelope);
         next();
     }catch (err){
-        res.status(500).send(err)
+        res.status(500).send(err);
     }
 };
 
 //Finds a certain envelope by ID and attatches it to the req object
-const findEnvelopeById = (req, res, next) => {
+const attatchEnvelopeById = (req, res, next) => {
     try{
         for(envelope of envelopes){
             if(req.id === envelope.id){
-                req.envelope = envelope
+                req.envelope = envelope;
                 return next();
             }
         }
-        res.status(404).send('No envelope with that id exists')
+        res.status(404).send({message: 'No envelope with that id exists'});
     }catch(err){
-        res.status(500).send(err)
+        res.status(500).send(err);
     }
 }
 
@@ -52,7 +52,7 @@ const replaceEnvelopeById = (req, res, next) => {
 
 module.exports = {
     addEnvelope,
-    findEnvelopeById,
+    attatchEnvelopeById,
     assignEnvelopeId,
     deleteEnvelopeById,
     replaceEnvelopeById

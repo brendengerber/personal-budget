@@ -5,7 +5,7 @@ const validateEnvelope = (req, res, next) => {
             req.envelope = req.body;
             next();
         }else{
-            res.status(400).send({message: 'Incorrect envelope format'});
+            res.status(400).send({message: 'Invalid envelope format'});
         }
     } catch(err){
        res.status(500).send(err);
@@ -13,19 +13,22 @@ const validateEnvelope = (req, res, next) => {
 };
 
 //Validates an ID ensuring it is a number
-const validateId = (req, res, next) => {
+const validateIdParameter = (req, res, next, id) => {
     try{
-        if(typeof(Number(req.params.id)) === 'number'){
-            req.id = req.params.id
-            next()
+        const convertedId = Number(id);
+        if(!Number.isNaN(convertedId)){
+            req.id = convertedId;
+            next();
+        }else{
+            res.status(400).send({message: 'Invalid ID'});
         }
     }catch(err){
-        res.status(500).send(err)
+        res.status(500).send(err);
     }
 }
 
 module.exports = {
     validateEnvelope,
-    validateId
+    validateIdParameter
 };
 
