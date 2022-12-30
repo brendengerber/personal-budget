@@ -8,6 +8,22 @@ Envelopes should be objects with the following format:
 }
 */
 
-let envelopes = []
+let envelopes = [
+    {
+        "category": "something",
+        "budget": 4000,
+        "id": 1
+    },
+    {
+        "category": "something",
+        "budget": 4000,
+        "id": 2
+    },
+    {
+        "category": "something",
+        "budget": 4000,
+        "id": 3
+    }
+]
 
 module.exports = envelopes;
