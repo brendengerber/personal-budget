@@ -15,7 +15,7 @@ envelopesRouter.get('/', (req, res, next) => {
 });
 
 envelopesRouter.post('/', validateEnvelope, assignEnvelopeId, addEnvelope, (req, res, next) => {
-    res.send(req.body);
+    res.send(req.envelope);
 });
 
 envelopesRouter.delete('/:id', (req, res, next) => {
@@ -23,4 +23,4 @@ envelopesRouter.delete('/:id', (req, res, next) => {
 })
 
 //Exports the router
-module.exports = envelopesRouter;
+module.exports = envelopesRouter;   

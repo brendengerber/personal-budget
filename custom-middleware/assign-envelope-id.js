@@ -10,7 +10,7 @@ const assignEnvelopeId = (req, res, next) => {
         }else{
             newId = envelopes[envelopes.length - 1].id + 1;
         }
-        req.body.id = newId;
+        req.envelope.id = newId;
         next();
     }catch(err){
         res.status(500).send(err);

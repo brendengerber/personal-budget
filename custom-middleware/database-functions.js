@@ -4,7 +4,7 @@ const envelopes = require('../envelopes.js');
 //Adds an envelope
 const addEnvelope = (req, res, next) => {
     try{
-        envelopes.push(req.body);
+        envelopes.push(req.envelope);
         next();
     }catch (err){
         res.status(500).send(err)
