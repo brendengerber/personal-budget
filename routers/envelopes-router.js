@@ -7,7 +7,6 @@ const {addEnvelope, attatchEnvelopeById, assignEnvelopeId, deleteEnvelopeById, r
 //Creates the router
 const envelopesRouter = express.Router();
 
-//Add param here to validate and attatch id first. Should this also find and attatch the envelope in question? Mayhaps (that function is in database functions now)
 envelopesRouter.param('id', validateIdParameter);
 
 envelopesRouter.get('/', (req, res, next) => {
@@ -19,12 +18,12 @@ envelopesRouter.post('/', validateEnvelope, assignEnvelopeId, addEnvelope, (req,
 });
 
 envelopesRouter.get('/:id', attatchEnvelopeById, (req, res, next) => {
-    res.send(req.envelope)
+    res.send(req.envelope);
 });
 
-envelopesRouter.delete('/:id', (req, res, next) => {
- //Add logic here
+envelopesRouter.delete('/:id', attatchEnvelopeById, deleteEnvelopeById, (req, res, next) => {
+    res.send({message: 'Envelope deleted.'});
 });
 
 //Exports the router
-module.exports = envelopesRouter;   
+module.exports = envelopesRouter;

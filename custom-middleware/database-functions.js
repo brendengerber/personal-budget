@@ -1,10 +1,11 @@
 //Imports envelopes
-const envelopes = require('../envelopes.js');
+let envelopes = require('../envelopes.js');
 
 //Adds an envelope
 const addEnvelope = (req, res, next) => {
     try{
         envelopes.push(req.envelope);
+        console.log(envelopes)
         next();
     }catch (err){
         res.status(500).send(err);
@@ -43,7 +44,16 @@ const assignEnvelopeId = (req, res, next) => {
 }
 
 const deleteEnvelopeById = (req, res, next) => {
-
+    try{
+        for(envelope of envelopes){
+            if(envelope.id === req.id){
+                envelopes.splice(envelopes.indexOf(envelope), 1);
+            }
+        }
+        next();
+    }catch(err){
+        res.status(500).send(err);
+    }
 }
 
 const replaceEnvelopeById = (req, res, next) => {
