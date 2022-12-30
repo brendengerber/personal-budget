@@ -2,8 +2,7 @@
 const express = require('express');
 const envelopes = require('../envelopes.js');
 const {validateEnvelope, validateId} = require('../custom-middleware/validation-functions.js')
-const assignEnvelopeId = require('../custom-middleware/assign-envelope-Id.js');
-const {addEnvelope, findEnvelopeById, deleteEnvelopeById, replaceEnvelopeById} = require('../custom-middleware/database-functions.js');
+const {addEnvelope, findEnvelopeById, assignEnvelopeId, deleteEnvelopeById, replaceEnvelopeById} = require('../custom-middleware/database-functions.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
