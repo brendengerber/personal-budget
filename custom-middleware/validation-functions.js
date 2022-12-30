@@ -1,3 +1,6 @@
+//Validation functions will add reqest bodies and parameters as custom properties to the req object.
+//This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted.
+
 //Validates the envelope format for post requsts
 const validateEnvelope = (req, res, next) => {
     try{

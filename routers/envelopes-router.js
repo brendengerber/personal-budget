@@ -2,7 +2,7 @@
 const express = require('express');
 const envelopes = require('../envelopes.js');
 const {validateEnvelope, validateIdParameter} = require('../custom-middleware/validation-functions.js');
-const {addEnvelope, attatchEnvelopeById, assignEnvelopeId, deleteEnvelopeById, replaceEnvelopeById} = require('../custom-middleware/database-functions.js');
+const {checkEnvelopeById, addEnvelope, attatchEnvelopeById, assignEnvelopeId, deleteEnvelopeById, updateEnvelopeById} = require('../custom-middleware/database-functions.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
@@ -17,13 +17,23 @@ envelopesRouter.post('/', validateEnvelope, assignEnvelopeId, addEnvelope, (req,
     res.send(req.envelope);
 });
 
-envelopesRouter.get('/:id', attatchEnvelopeById, (req, res, next) => {
+envelopesRouter.get('/:id', checkEnvelopeById, attatchEnvelopeById, (req, res, next) => {
     res.send(req.envelope);
 });
 
-envelopesRouter.delete('/:id', attatchEnvelopeById, deleteEnvelopeById, (req, res, next) => {
+envelopesRouter.put('/:id', validateEnvelope, checkEnvelopeById, updateEnvelopeById, attatchEnvelopeById, (req, res, next) => {
+    res.send(req.envelope);
+})
+
+envelopesRouter.delete('/:id', checkEnvelopeById, deleteEnvelopeById, (req, res, next) => {
     res.send({message: 'Envelope deleted.'});
 });
 
+envelopesRouter.post('/:from/:to', (req, res, next) => {
+
+})
+
 //Exports the router
 module.exports = envelopesRouter;
+
+

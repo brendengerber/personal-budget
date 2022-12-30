@@ -1,6 +1,20 @@
 //Imports envelopes
 let envelopes = require('../envelopes.js');
 
+//Checks if an envelope exists by id
+const checkEnvelopeById = (req, res, next) => {
+    try{
+        for(envelope of envelopes){
+            if(envelope.id === req.id){
+                return next();
+            }
+        }
+        res.status(404).send({message: 'No envelope with that id exists'});
+    }catch(err){
+        res.status(500).send(err);
+    }
+}
+
 //Adds an envelope
 const addEnvelope = (req, res, next) => {
     try{
@@ -18,10 +32,9 @@ const attatchEnvelopeById = (req, res, next) => {
         for(envelope of envelopes){
             if(req.id === envelope.id){
                 req.envelope = envelope;
-                return next();
+                next();
             }
         }
-        res.status(404).send({message: 'No envelope with that id exists'});
     }catch(err){
         res.status(500).send(err);
     }
@@ -56,14 +69,20 @@ const deleteEnvelopeById = (req, res, next) => {
     }
 }
 
-const replaceEnvelopeById = (req, res, next) => {
-    
+const updateEnvelopeById = (req, res, next) => {
+    try{
+        envelopes.forEach(function(envelope, i){if (envelope.id === req.id) envelopes[i] = req.envelope;});
+        next();
+    }catch(err){
+        res.status(500).send(err);
+    }
 }
 
 module.exports = {
+    checkEnvelopeById,
     addEnvelope,
     attatchEnvelopeById,
     assignEnvelopeId,
     deleteEnvelopeById,
-    replaceEnvelopeById
+    updateEnvelopeById
 };
