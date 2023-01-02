@@ -1,7 +1,8 @@
-//To minimize calls to the database, all checks for the existance of a resource will occur in each middleware that accesses the database in the form of an if statement
-//All the actual deleting, updating, etc are in the helper functions so they can be reused
-
-//Each function checks if the resource exists and sends 404 if not
+//All the actual deleting, updating, etc are performed the database-helper-functions so they can be reused
+//For example the budget transfer middleware uses an update function, which is also used in the middleware that updates a single envelope
+//Those functions will return false if the resource does not exist 
+//To minimize calls to the database, all checks for the existance of a resource will occur in each middleware that accesses the database 
+//This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
 
 //Imports envelopes and database helper functions
 let envelopes = require('../envelopes.js');
