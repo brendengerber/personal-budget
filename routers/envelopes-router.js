@@ -1,46 +1,49 @@
 //Imports necessary modules
 const express = require('express');
 const envelopes = require('../envelopes.js');
-const {validateEnvelope, validateIdParameter} = require('../custom-middleware/validation-functions.js');
-const {checkEnvelopeById, addEnvelope, attatchEnvelopeById, assignEnvelopeId, deleteEnvelopeById, updateEnvelopeById} = require('../custom-middleware/database-functions.js');
+const {validateEnvelope, validateIdParameter, validateTransferBudget} = require('../custom-middleware/validation-middleware.js');
+const {attatchEnvelopeById, addEnvelope, assignEnvelopeId, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
 
+//Validates all id parameters
 envelopesRouter.param('id', validateIdParameter('id'));
-envelopesRouter.param('from', validateIdParameter('fromId'))
-envelopesRouter.param('to', validateIdParameter('toId'))
+envelopesRouter.param('from', validateIdParameter('fromId'));
+envelopesRouter.param('to', validateIdParameter('toId'));
 
+//Gets all envelopes
 envelopesRouter.get('/', (req, res, next) => {
     res.send(envelopes);
 });
 
+//Gets an envelope with the specified id
+envelopesRouter.get('/:id', attatchEnvelopeById, (req, res, next) => {
+    res.send(req.envelope);
+});
+
+//Posts a new envelope
+//Body must be the new envelope in the form of a JSON object: {"category": string, "budget": number,}
 envelopesRouter.post('/', validateEnvelope, assignEnvelopeId, addEnvelope, (req, res, next) => {
     res.send(req.envelope);
 });
 
-envelopesRouter.get('/:id', checkEnvelopeById, attatchEnvelopeById, (req, res, next) => {
-    console.log(req.id)
+//Updates the envelope with the specified id
+//Body must be the new envelope in the form of a JSON object: {"category": string, "budget": number,}
+envelopesRouter.put('/:id', validateEnvelope, updateEnvelopeById, (req, res, next) => {
     res.send(req.envelope);
 });
 
-envelopesRouter.put('/:id', validateEnvelope, checkEnvelopeById, updateEnvelopeById, attatchEnvelopeById, (req, res, next) => {
-    res.send(req.envelope);
-})
-
-envelopesRouter.delete('/:id', checkEnvelopeById, deleteEnvelopeById, (req, res, next) => {
-    res.send({message: `Envelope with id: ${req.id} has been deleted.`});
+//Deletes the envelope with the specified id
+envelopesRouter.delete('/:id', deleteEnvelopeById, (req, res, next) => {
+    res.send({message: `Envelope with ID ${req.id} has been deleted.`});
 });
 
-envelopesRouter.post('/:from/:to', (req, res, next) => {
-
-})
+//Transfers the specified budget from the specified envelope to the second specified envelope
+//Body must be the transfer amount in the form of a JSON object: {"transferBudget": 2000}
+envelopesRouter.put('/:from/transfer/:to', validateTransferBudget, transferEnvelopeBudget,(req, res, next) => {
+    res.send({message: `The budget of ${req.transferBudget} has been transferred from ID ${req.fromId} to ID ${req.toId}.`});
+});
 
 //Exports the router
 module.exports = envelopesRouter;
-
-//move checkenvelopebyid to param? and add function wrapper to validate and check so it can be used for various ids.  The outter function can take the variable that will be the forth variable of the inner param funcint
-
-
-//does attatching the id variable attatch to req.id or req.to, req.from, req.id? change the last arg to test and see if you can still console log req.id
-//add a fourth parameter to checkenvelopebyid("to") which will be which property to check, then in the function req[id/to/from] 

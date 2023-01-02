@@ -1,14 +1,15 @@
 //Validation functions will add reqest bodies and parameters as custom properties to the req object.
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted.
 
-//Validates the envelope format for post requsts and attatches it to req.envelope
+//Validates the envelope format in req body and attatches it to req.envelope
 const validateEnvelope = (req, res, next) => {
     try{
-        if(typeof(req.body.budget) === 'number' && typeof(req.body.category) === 'string'){
+        //Validates type for each property and the number of properties to disallow objects with incorrect property types or extra properties
+        if(typeof(req.body.budget) === 'number' && typeof(req.body.category) === 'string' && Object.keys(req.body).length === 2){
             req.envelope = req.body;
             next();
         }else{
-            res.status(400).send({message: 'Invalid envelope format'});
+            res.status(400).send({message: 'Invalid envelope format.'});
         }
     } catch(err){
        res.status(500).send(err);
@@ -27,34 +28,32 @@ const validateIdParameter = (customProperty) => {
                 req[customProperty] = convertedId;
                 next();
             }else{
-                res.status(400).send({message: `Sorry ${test} is an invalid ID`});
+                res.status(400).send({message: `Sorry ${id} is an invalid ID.`});
             }
         }catch(err){
             res.status(500).send(err);
         }
     };
 }
-  
-    
 
-
-// // Validates an ID ensuring it is a number
-// const validateIdParameter = (req, res, next, id) => {
-//     try{
-//         const convertedId = Number(id);
-//         if(!Number.isNaN(convertedId)){
-//             req.id = convertedId;
-//             next();
-//         }else{
-//             res.status(400).send({message: `Sorry ${test} is an invalid ID`});
-//         }
-//     }catch(err){
-//         res.status(500).send(err);
-//     }
-// };
+//Validates the balance format in req body and attatches it to req.transferBalance
+const validateTransferBudget = (req, res, next) => {
+    try{
+        const convertedTransferBudget = Number(req.body.transferBudget);
+        if(!Number.isNaN(convertedTransferBudget)){
+            req.transferBudget = convertedTransferBudget;
+            next();
+        }else{
+            res.status(400).send({message: `Sorry ${req.body} is an invalid transfer budget.`});
+        }
+    }catch(err){
+        res.status(500).send(err);
+    }
+}
 
 module.exports = {
     validateEnvelope,
-    validateIdParameter
+    validateIdParameter,
+    validateTransferBudget
 };
 

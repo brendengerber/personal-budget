@@ -1,6 +1,6 @@
 //Variable used to hold envelopes, will replace with database
 /* 
-Envelopes should be objects with the following format:
+Envelopes are objects with the following format after an id is assigned:
 {
     category: string,
     budget: number,
