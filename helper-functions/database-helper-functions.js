@@ -5,53 +5,58 @@
 //Imports envelopes
 let envelopes = require('../envelopes.js');
 
-const findEnvelope = (searchId) => {
+//Helper function used in this module
+const findEntryIndex = (searchId) => {    
+    let index = envelopes.findIndex((envelope) => envelope.id == searchId);
+    if(index !== -1 ){
+        return index
+    }
+    return false
+};
+
+const findEntry = (searchId) => {
     for(envelope of envelopes){
         if(envelope.id === searchId){
             return envelope
         }
     }
     return false
-}
+};
 
-const findEnvelopeIndex = (searchId) => {    
-    let index = envelopes.findIndex((envelope) => envelope.id == searchId);
-    if(index !== -1 ){
-        return index
-    }
-    return false
-} 
-    
-const updateEnvelope = (id, newEnvelope) => {
-    let index = findEnvelopeIndex(id);
+const addEntry = (entry, array) => {
+    array.push(entry);
+};
+   
+const updateEntry = (id, newEnvelope) => {
+    let index = findEntryIndex(id);
     if(index || index === 0){
         envelopes[index] = newEnvelope;
         return envelopes[index]
     }
     return false
-}
+};
 
-const deleteEnvelope = (id) => {
-    let index = findEnvelopeIndex(id)  ;  
+const deleteEntry = (id) => {
+    let index = findEntryIndex(id)  ;  
     if(index || index === 0){
         return envelopes.splice(index, 1);
     }
     return false
-}
+};
 
-const updateBudget = (id, transferBudget) => {
-    let index = findEnvelopeIndex(id);
+const updateEntryBudget = (id, transferBudget) => {
+    let index = findEntryIndex(id);
     if(index || index === 0){
         envelopes[index].budget = envelopes[index].budget + transferBudget;
         return envelopes[index];
     }
     return false
-}
+};
 
 module.exports = {
-    findEnvelope,
-    findEnvelopeIndex,
-    updateEnvelope,
-    deleteEnvelope,
-    updateBudget
+    findEntry,
+    addEntry,
+    updateEntry,
+    deleteEntry,
+    updateEntryBudget
 };
