@@ -6,7 +6,7 @@
 
 //Imports envelopes and database helper functions
 let envelopes = require('../envelopes.js');
-const {findEntry, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
+const {assignEntryId, findEntry, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope
 const addEnvelope = (req, res, next) => {
@@ -21,13 +21,7 @@ const addEnvelope = (req, res, next) => {
 //Assigns an id to the envelope in the req body based on the current highest id
 const assignEnvelopeId = (req, res, next) => {
     try{
-        let newId;
-        if(envelopes.length === 0){
-            newId = 1;
-        }else{
-            newId = envelopes[envelopes.length - 1].id + 1;
-        }
-        req.envelope.id = newId;
+        req.envelope.id = assignEntryId(envelopes);
         next();
     }catch(err){
         res.status(500).send(err);

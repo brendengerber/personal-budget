@@ -14,6 +14,19 @@ const findEntryIndex = (searchId) => {
     return false
 };
 
+const assignEntryId = (array) => {
+    let newId;
+    console.log(array)
+    console.log(array[1])
+    if(array.length === 0){
+        newId = 1;
+    }else{
+        newId = array[array.length - 1].id + 1;
+        console.log(newId)
+    }
+    return newId;
+};
+
 const findEntry = (searchId) => {
     for(envelope of envelopes){
         if(envelope.id === searchId){
@@ -54,6 +67,7 @@ const updateEntryBudget = (id, transferBudget) => {
 };
 
 module.exports = {
+    assignEntryId,
     findEntry,
     addEntry,
     updateEntry,
