@@ -1,8 +1,8 @@
 //Imports necessary modules
 const express = require('express');
 const envelopes = require('../envelopes.js');
-const {validateEnvelope, validateIdParameter, validateTransferBudget} = require('../custom-middleware/validation-middleware.js');
-const {attatchEnvelopeById, addEnvelope, assignEnvelopeId, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
+const {validateEnvelopeData, validateIdParameter, validateTransferBudget} = require('../custom-middleware/validation-middleware.js');
+const {attatchEnvelopeById, addEnvelope, assignEnvelopeId, assembleEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
@@ -24,13 +24,13 @@ envelopesRouter.get('/:id', attatchEnvelopeById, (req, res, next) => {
 
 //Posts a new envelope
 //Body must be the new envelope in the form of a JSON object: {"category": string, "budget": number,}
-envelopesRouter.post('/', validateEnvelope, assignEnvelopeId, addEnvelope, (req, res, next) => {
+envelopesRouter.post('/', validateEnvelopeData, assignEnvelopeId, addEnvelope, (req, res, next) => {
     res.send(req.envelope);
 });
 
 //Updates the envelope with the specified id
 //Body must be the new envelope in the form of a JSON object: {"category": string, "budget": number,}
-envelopesRouter.put('/:id', validateEnvelope, updateEnvelopeById, (req, res, next) => {
+envelopesRouter.put('/:id', validateEnvelopeData, assembleEnvelope, updateEnvelopeById, (req, res, next) => {
     res.send(req.envelope);
 });
 

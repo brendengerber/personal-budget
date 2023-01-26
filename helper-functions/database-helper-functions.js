@@ -2,6 +2,8 @@
 //These functions return false if the resource does not exist which allows middleware to check existance using an if statement and sending a 404 if it is false
 //These functions are separate from the middleware. If we change where a resource is located it will need new code to manipulate it, that code can go here, leaving the actual routers untouched as the new functions will return the same results as before.
 
+//******change envelopes to something generic, and have the database as a arg */
+
 //Imports envelopes
 let envelopes = require('../envelopes.js');
 

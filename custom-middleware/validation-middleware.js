@@ -2,11 +2,12 @@
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted.
 
 //Validates the envelope format in req body and attatches it to req.envelope
-const validateEnvelope = (req, res, next) => {
+const validateEnvelopeData = (req, res, next) => {
     try{
         //Validates type for each property and the number of properties to disallow objects with incorrect property types or extra properties
         if(typeof(req.body.budget) === 'number' && typeof(req.body.category) === 'string' && Object.keys(req.body).length === 2){
-            req.envelope = req.body;
+            req.budget = req.body.budget;
+            req.category = req.body.category
             next();
         }else{
             res.status(400).send({message: 'Invalid envelope format.'});
@@ -52,7 +53,7 @@ const validateTransferBudget = (req, res, next) => {
 }
 
 module.exports = {
-    validateEnvelope,
+    validateEnvelopeData,
     validateIdParameter,
     validateTransferBudget
 };

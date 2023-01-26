@@ -28,6 +28,19 @@ const assignEnvelopeId = (req, res, next) => {
     }
 }
 
+//Assembles an envelope object from the req properties
+const assembleEnvelope = (req, res, next) => {
+    try{
+        req.envelope = {};
+        req.envelope.budget = req.budget;
+        req.envelope.category = req.category;
+        req.envelope.id = req.id;
+        next();
+    }catch(err){
+        res.status(500).send(err);
+    }
+}
+
 // Checks if an envelope exists by id, attatches it to the req object, and sends an error if it does not exist
 const attatchEnvelopeById = (req, res, next) => {
     try{
@@ -107,6 +120,7 @@ module.exports = {
     attatchEnvelopeById,
     addEnvelope,
     assignEnvelopeId,
+    assembleEnvelope,
     deleteEnvelopeById,
     updateEnvelopeById,
     transferEnvelopeBudget
