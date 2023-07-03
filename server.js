@@ -4,6 +4,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const config = require('config.js');
 
 const app = express();
 
@@ -30,7 +31,7 @@ app.get('/*', (req, res, next) => {
   });  
 
 //Sets the port and starts the server
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || config.port;
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

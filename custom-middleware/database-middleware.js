@@ -5,7 +5,6 @@
 //This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
 
 //Imports envelopes and database helper functions
-let envelopes = require('../envelopes.js');
 const {assignEntryId, findEntry, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope

@@ -4,9 +4,6 @@
 
 //******change envelopes to something generic, and have the database as a arg */
 
-//Imports envelopes
-let envelopes = require('../envelopes.js');
-
 //Helper function used in this module
 const findEntryIndex = (searchId) => {    
     let index = envelopes.findIndex((envelope) => envelope.id == searchId);

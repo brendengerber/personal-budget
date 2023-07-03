@@ -1,6 +1,5 @@
 //Imports necessary modules
 const express = require('express');
-const envelopes = require('../envelopes.js');
 const {validateEnvelopeData, validateIdParameter, validateTransferBudget} = require('../custom-middleware/validation-middleware.js');
 const {attatchEnvelopeById, addEnvelope, assignEnvelopeId, assembleEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
 
