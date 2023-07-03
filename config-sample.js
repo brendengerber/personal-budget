@@ -3,7 +3,7 @@ const config = {
     port: 3000,
     database: 'personal-budget',
     databaseHost: 'localHost',
-    databaseUsername: 'postgrres',
+    databaseUsername: 'postgres',
     databasePassword: 'postgres',
     databasePort: 5432
 }
