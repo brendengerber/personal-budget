@@ -7,7 +7,8 @@ const validateEnvelopeData = (req, res, next) => {
         //Validates type for each property and the number of properties to disallow objects with incorrect property types or extra properties
         if(typeof(req.body.budget) === 'number' && typeof(req.body.category) === 'string' && Object.keys(req.body).length === 2){
             req.budget = req.body.budget;
-            req.category = req.body.category
+            req.category = req.body.category;
+            req.envelope = req.body;
             next();
         }else{
             res.status(400).send({message: 'Invalid envelope format.'});
