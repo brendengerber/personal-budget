@@ -6,17 +6,22 @@
 const {pool} = require('../queries.js');
 
 //** needs refactoring */
-const assignEntryId = (array) => {
+const assignEntryId = async (table) => {
     try{
         let newId;
-        let unique = false;
+        let unique = undefined;
+
         //Continues generating v4 UUIDs until a unique one is generated
         while(!unique){
             newId = crypto.randomUUID();
-            unique = !data["get"+dataSet]().hasOwnProperty(newId);
+            if(await !findEntry(table, newId)){
+                unique = true;
+            }
+            
         }
         //Reserves the v4 UUID so it cannot be taken by another request coming in before processing has been completed
-        data["save"+dataSet.slice(0, -1)]({id: newId});
+        //********** need to probably reserve this with a blank add, then use update instead of insert for POST   
+
         //Returns the v4 UUID for use in consequent functions and middleware
         return newId;
     }catch(err){
