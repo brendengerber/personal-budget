@@ -1,4 +1,4 @@
-//Sample config file as config.js is not included in version control as it contains sensitive information
+//Sample config file as config.js is not included in version control to protect sensitive information
 const config = {
     port: 3000,
     database: 'personal_budget',
