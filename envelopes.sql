@@ -1,5 +1,5 @@
 CREATE TABLE "envelopes" (
-  "id" int PRIMARY KEY,
+  "id" varchar PRIMARY KEY,
   "category" varchar(50),
   "budget" numeric(100, 2)
 );
