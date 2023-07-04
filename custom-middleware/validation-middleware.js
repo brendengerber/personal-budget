@@ -17,7 +17,7 @@ const validateEnvelopeData = (req, res, next) => {
             res.status(400).send({message: 'Invalid envelope format.'});
         }
     } catch(err){
-       res.status(500).send(err);
+       next(err);
     }
 };
 

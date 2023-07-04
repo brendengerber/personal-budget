@@ -14,7 +14,7 @@ const addEnvelope = async (req, res, next) => {
         await addEntry(req.envelope, 'envelopes');
         next();
     }catch (err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 
@@ -25,7 +25,7 @@ const assignEnvelopeId = async (req, res, next) => {
         req.envelope.id = await assignEntryId('envelopes');
         next();
     }catch(err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 
@@ -39,7 +39,7 @@ const attatchEnvelopeById =  async (req, res, next) => {
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
     }catch(err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 
