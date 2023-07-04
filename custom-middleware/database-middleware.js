@@ -4,6 +4,7 @@
 //To minimize calls to the database, all checks for the existance of a resource will occur in each middleware that accesses the database 
 //This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
 //************Change export and import orders to match the order in this file
+//**********Update comments to match  */
 
 //Imports database helper functions
 const {findEntry, assignEntryId, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
@@ -19,7 +20,6 @@ const addEnvelope = async (req, res, next) => {
 };
 
 //Assigns an id to the envelope in the req body based on the current highest id
-//Can also refactor using
 const assignEnvelopeId = async (req, res, next) => {
     try{
         req.envelope.id = await assignEntryId('envelopes');
@@ -59,7 +59,7 @@ const attatchEnvelopeById =  async (req, res, next) => {
 
 
 
-
+//****These need */
 //Assembles an envelope object from the req properties
 const assembleEnvelope = (req, res, next) => {
     try{
@@ -69,7 +69,7 @@ const assembleEnvelope = (req, res, next) => {
         req.envelope.id = req.id;
         next();
     }catch(err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 
@@ -83,7 +83,7 @@ const updateEnvelopeById = (req, res, next) => {
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
     }catch(err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 
@@ -95,7 +95,7 @@ const deleteEnvelopeById = (req, res, next) => {
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
     }catch(err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 
@@ -133,7 +133,7 @@ const transferEnvelopeBudget = (req, res, next) => {
         res.status(404).send({message: errorMessage.trim()});
         
     }catch(err){
-        res.status(500).send(err.message);
+        next(err);
     }
 };
 

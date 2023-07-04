@@ -4,7 +4,6 @@
 //Imports necessary modules
 const {validateBudget, validateId} = require('../helper-functions/validation-helper-functions.js');
 
-
 //*********************NEEDS REFACTORING TO USE SCHEMA in helper function */
 //Validates the envelope format in req body and attatches it to req.envelope
 const validateEnvelopeData = (req, res, next) => {
