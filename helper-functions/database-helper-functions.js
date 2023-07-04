@@ -2,37 +2,36 @@
 //These functions return false if the resource does not exist which allows middleware to check existance using an if statement and sending a 404 if it is false
 //These functions are separate from the middleware. If we change where a resource is located it will need new code to manipulate it, that code can go here, leaving the actual routers untouched as the new functions will return the same results as before.
 
-//******change envelopes to something generic, and have the database as a arg */
+//Imports necessary modules
+const {pool} = require('../queries.js');
 
-//Helper function used in this module
-const findEntryIndex = (searchId) => {    
-    let index = envelopes.findIndex((envelope) => envelope.id == searchId);
-    if(index !== -1 ){
-        return index
-    }
-    return false
-};
-
+//** needs refactoring */
 const assignEntryId = (array) => {
-    let newId;
-    console.log(array)
-    console.log(array[1])
-    if(array.length === 0){
-        newId = 1;
-    }else{
-        newId = array[array.length - 1].id + 1;
-        console.log(newId)
+    try{
+        let newId;
+        let unique = false;
+        //Continues generating v4 UUIDs until a unique one is generated
+        while(!unique){
+            newId = crypto.randomUUID();
+            unique = !data["get"+dataSet]().hasOwnProperty(newId);
+        }
+        //Reserves the v4 UUID so it cannot be taken by another request coming in before processing has been completed
+        data["save"+dataSet.slice(0, -1)]({id: newId});
+        //Returns the v4 UUID for use in consequent functions and middleware
+        return newId;
+    }catch(err){
+        throw err;
     }
-    return newId;
 };
 
-const findEntry = (searchId) => {
-    for(envelope of envelopes){
-        if(envelope.id === searchId){
-            return envelope
-        }
-    }
-    return false
+//Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
+const findEntry = async (table, searchId) => {
+    try{
+        let result = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [searchId]);
+        return result.rows[0];
+    }catch(err){
+        throw err;
+    };
 };
 
 const addEntry = (entry, array) => {

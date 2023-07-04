@@ -40,19 +40,19 @@ const assembleEnvelope = (req, res, next) => {
     }
 }
 
-// Checks if an envelope exists by id, attatches it to the req object, and sends an error if it does not exist
-const attatchEnvelopeById = (req, res, next) => {
+// Checks if an envelope exists by id, attatches it to the req object, and sends a 404 error if it does not exist
+const attatchEnvelopeById =  async (req, res, next) => {
     try{
-        //Sets req.envelope to the envelope that corisponds with the id, and is set to false if the resources doesn't exist
-        req.envelope = findEntry(req.id);
+        //Sets req.envelope to the envelope that corisponds with the id
+        req.envelope =  await findEntry('envelopes', req.id);
         if(req.envelope){
-            return next()
+            return next();
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
     }catch(err){
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
-}
+};
 
 //Updates the envelope with the specified id with a specified new envelope
 const updateEnvelopeById = (req, res, next) => {
