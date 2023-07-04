@@ -1,5 +1,5 @@
 //Imports config 
-const config = require('config.js');
+const {config} = require('./config.js');
 
 //Sets up database connection configuration
 const Pool = require('pg').Pool
@@ -9,4 +9,6 @@ const pool = new Pool({
   database: config.database,
   password: config.databasePassword,
   port: config.databasePort,
-})
+});
+
+module.exports = {pool};

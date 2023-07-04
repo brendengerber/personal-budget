@@ -4,7 +4,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const config = require('config.js');
+const {config} = require('./config.js');
 
 const app = express();
 

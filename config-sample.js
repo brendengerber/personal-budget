@@ -1,11 +1,11 @@
-//Normally this file would be excluded from version control in order to not expose sensitive information
+//Sample config file as config.js is not included in version control as it contains sensitive information
 const config = {
     port: 3000,
-    database: 'personal-budget',
+    database: 'personal_budget',
     databaseHost: 'localHost',
-    databaseUsername: 'postgres',
+    databaseUser: 'postgres',
     databasePassword: 'postgres',
     databasePort: 5432
-}
+};
 
 module.exports = {config};
