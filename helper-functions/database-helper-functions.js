@@ -5,6 +5,16 @@
 //Imports necessary modules
 const {pool} = require('../queries.js');
 
+//Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
+const findEntry = async (table, searchId) => {
+    try{
+        let result = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [searchId]);
+        return result.rows[0];
+    }catch(err){
+        throw err;
+    };
+};
+
 //** needs refactoring */
 const assignEntryId = async (table) => {
     try{
@@ -27,16 +37,6 @@ const assignEntryId = async (table) => {
     }catch(err){
         throw err;
     }
-};
-
-//Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
-const findEntry = async (table, searchId) => {
-    try{
-        let result = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [searchId]);
-        return result.rows[0];
-    }catch(err){
-        throw err;
-    };
 };
 
 const addEntry = (entry, array) => {
@@ -70,8 +70,8 @@ const updateEntryBudget = (id, transferBudget) => {
 };
 
 module.exports = {
-    assignEntryId,
     findEntry,
+    assignEntryId,
     addEntry,
     updateEntry,
     deleteEntry,

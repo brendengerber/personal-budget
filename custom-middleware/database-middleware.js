@@ -5,7 +5,7 @@
 //This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
 
 //Imports database helper functions
-const {assignEntryId, findEntry, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
+const {findEntry, assignEntryId, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope
 const addEnvelope = (req, res, next) => {
