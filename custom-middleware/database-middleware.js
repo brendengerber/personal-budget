@@ -23,7 +23,6 @@ const addEnvelope = async (req, res, next) => {
 const assignEnvelopeId = async (req, res, next) => {
     try{
         req.envelope.id = await assignEntryId('envelopes');
-        console.log(req.envelope.id)
         next();
     }catch(err){
         res.status(500).send(err.message);

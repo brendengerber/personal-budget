@@ -37,7 +37,6 @@ const assignEntryId = async (table) => {
         //Returns the v4 UUID for use in consequent functions and middleware
         return newId;
     }catch(err){
-        console.log(err)
         throw err;
     }
 };
