@@ -3,40 +3,30 @@
 //Those functions will return false if the resource does not exist 
 //To minimize calls to the database, all checks for the existance of a resource will occur in each middleware that accesses the database 
 //This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
+//************Change export and import orders to match the order in this file
 
 //Imports database helper functions
 const {findEntry, assignEntryId, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope
-const addEnvelope = (req, res, next) => {
+const addEnvelope = async (req, res, next) => {
     try{
-        addEntry(req.envelope, envelopes)
+        await addEntry(req.envelope, 'envelopes');
         next();
     }catch (err){
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 };
 
 //Assigns an id to the envelope in the req body based on the current highest id
+//Can also refactor using
 const assignEnvelopeId = async (req, res, next) => {
     try{
         req.envelope.id = await assignEntryId('envelopes');
+        console.log(req.envelope.id)
         next();
     }catch(err){
-        res.status(500).send(err);
-    }
-};
-
-//Assembles an envelope object from the req properties
-const assembleEnvelope = (req, res, next) => {
-    try{
-        req.envelope = {};
-        req.envelope.budget = req.budget;
-        req.envelope.category = req.category;
-        req.envelope.id = req.id;
-        next();
-    }catch(err){
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 };
 
@@ -54,6 +44,38 @@ const attatchEnvelopeById =  async (req, res, next) => {
     }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Assembles an envelope object from the req properties
+const assembleEnvelope = (req, res, next) => {
+    try{
+        req.envelope = {};
+        req.envelope.budget = req.budget;
+        req.envelope.category = req.category;
+        req.envelope.id = req.id;
+        next();
+    }catch(err){
+        res.status(500).send(err.message);
+    }
+};
+
+
+
 //Updates the envelope with the specified id with a specified new envelope
 const updateEnvelopeById = (req, res, next) => {
     try{
@@ -62,7 +84,7 @@ const updateEnvelopeById = (req, res, next) => {
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
     }catch(err){
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 };
 
@@ -74,11 +96,12 @@ const deleteEnvelopeById = (req, res, next) => {
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
     }catch(err){
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 };
 
 //Transfers the specified budget from the specified envelope to the second specified envelope
+//**********needs refactoring to asyn for findEntry */
 const transferEnvelopeBudget = (req, res, next) => {
     try{
         //Saves the original envelopes
@@ -111,7 +134,7 @@ const transferEnvelopeBudget = (req, res, next) => {
         res.status(404).send({message: errorMessage.trim()});
         
     }catch(err){
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 };
 

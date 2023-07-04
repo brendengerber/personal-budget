@@ -4,6 +4,7 @@
 
 //Imports necessary modules
 const {pool} = require('../queries.js');
+const crypto = require('crypto');
 
 //Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
 const findEntry = async (table, searchId) => {
@@ -24,7 +25,8 @@ const assignEntryId = async (table) => {
         //Continues generating v4 UUIDs until a unique one is generated
         while(!unique){
             newId = crypto.randomUUID();
-            if(await !findEntry(table, newId)){
+            let exists = await findEntry(table, newId);
+            if(!exists){
                 unique = true;
             }
             
@@ -35,14 +37,42 @@ const assignEntryId = async (table) => {
         //Returns the v4 UUID for use in consequent functions and middleware
         return newId;
     }catch(err){
+        console.log(err)
         throw err;
     }
 };
 
-const addEntry = (entry, array) => {
-    array.push(entry);
+const addEntry = async (entry, table) => {
+    try{
+        await pool.query(`INSERT INTO ${table} (id, category, budget) VALUES ($1, $2, $3) RETURNING *`, [entry.id, entry.category, entry.budget]);
+        return;
+    }catch(err){
+        throw err;
+    };
 };
    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const updateEntry = (id, newEnvelope) => {
     let index = findEntryIndex(id);
     if(index || index === 0){
