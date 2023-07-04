@@ -5,9 +5,6 @@ const validator = require('validator');
 //"budget" is a string to validate
 const validateBudget = function(budget){
     try{
-        if(typeof budget !== 'string'){
-            return undefined;
-        };
         if(!validator.isCurrency(budget, {thousands_separator: '', require_decimal: true, digits_after_decimal: [2]}) || isNaN(price)){
             return false;
         };

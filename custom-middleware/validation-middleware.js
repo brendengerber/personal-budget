@@ -4,6 +4,8 @@
 //Imports necessary modules
 const {validateBudget, validateId} = require('../helper-functions/validation-helper-functions.js');
 
+
+//*********************NEEDS REFACTORING TO USE SCHEMA in helper function */
 //Validates the envelope format in req body and attatches it to req.envelope
 const validateEnvelopeData = (req, res, next) => {
     try{
@@ -42,16 +44,15 @@ const validateIdParameter = (customProperty) => {
     };
 };
 
-
 //Validates the balance format in req body and attatches it to req.transferBalance
 const validateTransferBudget = (req, res, next) => {
     try{
-        const convertedTransferBudget = Number(req.body.transferBudget);
-        if(!Number.isNaN(convertedTransferBudget)){
-            req.transferBudget = convertedTransferBudget;
+        if(validateBudget(req.body.transferBudget)){
+//************Does this need to be changed to number? like before? try transferring the same budget twice to see */
+            req.transferBudget = req.body.transferBudget;
             next();
         }else{
-            res.status(400).send({message: `Sorry ${req.body} is an invalid transfer budget.`});
+            res.status(400).send({message: `Sorry ${req.body.transferBudget} is an invalid transfer budget.`});
         }
     }catch(err){
         next(err);
