@@ -1,6 +1,9 @@
 //Validation functions will add reqest bodies and parameters as custom properties to the req object.
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted.
 
+//Imports necessary modules
+const {validateBudget, validateId} = require('../helper-functions/validation-helper-functions.js');
+
 //Validates the envelope format in req body and attatches it to req.envelope
 const validateEnvelopeData = (req, res, next) => {
     try{
@@ -25,18 +28,20 @@ const validateEnvelopeData = (req, res, next) => {
 const validateIdParameter = (customProperty) => {
     return (req, res, next, id) => {
         try{
-            const convertedId = Number(id);
-            if(!Number.isNaN(convertedId)){
-                req[customProperty] = convertedId;
+            if(validateId(id)){
+                req[customProperty] = id;
                 next();
             }else{
-                res.status(400).send({message: `Sorry ${id} is an invalid ID.`});
+                const err = new Error(`The request ID ${id} is not a valid v4 UUID.`);
+                err.status = 400;
+                next(err);
             }
         }catch(err){
-            res.status(500).send(err);
+            next(err);
         }
     };
-}
+};
+
 
 //Validates the balance format in req body and attatches it to req.transferBalance
 const validateTransferBudget = (req, res, next) => {
@@ -49,7 +54,7 @@ const validateTransferBudget = (req, res, next) => {
             res.status(400).send({message: `Sorry ${req.body} is an invalid transfer budget.`});
         }
     }catch(err){
-        res.status(500).send(err);
+        next(err);
     }
 }
 
