@@ -24,35 +24,34 @@ const addEntry = async (entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
         let values = Object.values(entry);
+        
+        //Creates the array used to create the VALUES string
         let numberedPlaceholders = [];
         for(let i = 1; i <= queryParameters.length; i++){
             numberedPlaceholders.push(`$${i}`);
         }
+
         let addedEntry = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${numberedPlaceholders.join(', ')}) RETURNING *`, values);
+        
         return addedEntry.rows[0];
     }catch(err){
         throw err;
     };
 };
 
+//Entry must be an object that begins with an id property
 const updateEntry = async (entry, table) => {
     try{
-        //Creates the array of queryParameters
         let queryParameters = Object.getOwnPropertyNames(entry);
-        
-        //Creates the array of values with id at the end
         let values = Object.values(entry);
-        values.push(values.shift());
 
         //Creates the array used to create the SET string
-        let queryParametersAndnumberedPlaceholders = [];
-        let numberedPlaceholdersCounter = 1;
-        for(let parameter of queryParameters.slice(1)){
-            queryParametersAndnumberedPlaceholders.push(`${parameter} = $${numberedPlaceholdersCounter}`);
-            numberedPlaceholdersCounter ++;
+        let setStringArray = [];
+        for(let i = 2; i <= queryParameters.length; i++){
+            setStringArray.push(`${queryParameters[i-1]} = $${i}`);
         };
 
-        let updatedEntry = await pool.query(`UPDATE ${table} SET ${queryParametersAndnumberedPlaceholders.join(', ')} WHERE id = $${numberedPlaceholdersCounter} RETURNING *`, values);
+        let updatedEntry = await pool.query(`UPDATE ${table} SET ${setStringArray.join(', ')} WHERE id = $1 RETURNING *`, values);
 
         return updatedEntry.rows[0];
     }catch(err){
