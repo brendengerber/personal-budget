@@ -37,42 +37,24 @@ const attatchEnvelopeById =  async (req, res, next) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-//***********************FINISH REFACTORING BELOW TO USE DATABASE */
-
-
-
-
-
-//****These need */
 //Assembles an envelope object from the req properties
 const assembleEnvelope = (req, res, next) => {
     try{
         req.envelope = {};
-        req.envelope.budget = req.budget;
-        req.envelope.category = req.category;
         req.envelope.id = req.id;
+        req.envelope.category = req.category;
+        req.envelope.budget = req.budget;
         next();
     }catch(err){
         next(err);
     }
 };
 
-
-
 //Updates the envelope with the specified id with a specified new envelope
-const updateEnvelopeById = (req, res, next) => {
+const updateEnvelopeById = async (req, res, next) => {
     try{
-        if(updateEntry(req.id, req.envelope)){
+        req.envelope = await updateEntry(req.envelope, 'envelopes');
+        if(req.envelope){
             return next();
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
@@ -80,6 +62,29 @@ const updateEnvelopeById = (req, res, next) => {
         next(err);
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Deletes the envelope of the specified id
 const deleteEnvelopeById = (req, res, next) => {
@@ -95,14 +100,15 @@ const deleteEnvelopeById = (req, res, next) => {
 
 //Transfers the specified budget from the specified envelope to the second specified envelope
 //**********needs refactoring to asyn for findEntry */
+//*********move transfer logic to helper functions? */
 const transferEnvelopeBudget = (req, res, next) => {
     try{
         //Saves the original envelopes
         let fromEnvelopeOriginal = findEntry(req.fromId);
-        let toEnvelopeOrigional = findEntry(req.toId);
+        let toEnvelopeOriginal = findEntry(req.toId);
 
         //Updates the envelopes if they both exist
-        if(fromEnvelopeOriginal && toEnvelopeOrigional){
+        if(fromEnvelopeOriginal && toEnvelopeOriginal){
             let fromEnvelopeUpdated = updateEntryBudget(req.fromId, -req.transferBudget);
             let toEnvelopeUpdated = updateEntryBudget(req.toId, req.transferBudget);
             //Calls next() if both updates are successful
@@ -110,8 +116,8 @@ const transferEnvelopeBudget = (req, res, next) => {
                 return next();
             // If some error occured and one envelope was not successfully updated, the envelopes are returned to their original states and an error message is sent
             }else if(!fromEnvelopeUpdated || !toEnvelopeUpdated){
-                updateEntry(req.fromId, fromEnvelopeOriginal);
-                updateEntry(req.toId, toEnvelopeOrigional);
+                updateEntry(fromEnvelopeOriginal, 'envelopes');
+                updateEntry(toEnvelopeOriginal, 'envelopes');
                 return res.status(500).send({message: 'An unknown error has occured and envelopes have been reset to their original values'});
             }
         }
@@ -121,7 +127,7 @@ const transferEnvelopeBudget = (req, res, next) => {
         if(!fromEnvelopeOriginal){
             errorMessage += ` Envelope with ID ${req.fromId} does not exist.`;
         }
-        if(!toEnvelopeOrigional){
+        if(!toEnvelopeOriginal){
             errorMessage += ` Envelope with ID ${req.toId} does not exist.`;
         }
         res.status(404).send({message: errorMessage.trim()});

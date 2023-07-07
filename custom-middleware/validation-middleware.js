@@ -6,7 +6,7 @@ const {validateBudget, validateId} = require('../helper-functions/validation-hel
 
 //*********************NEEDS REFACTORING TO USE SCHEMA in helper function */
 //Validates the envelope format in req body and attatches it to req.envelope
-const validateEnvelopeData = (req, res, next) => {
+const validateReqEnvelope = (req, res, next) => {
     try{
         //Validates type for each property and the number of properties to disallow objects with incorrect property types or extra properties
         if(typeof(req.body.budget) === 'number' && typeof(req.body.category) === 'string' && Object.keys(req.body).length === 2){
@@ -26,7 +26,7 @@ const validateEnvelopeData = (req, res, next) => {
 //This middleware uses a function wrapper so that it can be used even in routes that have multiple IDs such as transfer
 //The customProperty argument is a string used to declare where to attach the validated id
 //For example in the transfer route you can attach one ID to req.fromId and one ID to req.toId
-const validateIdParameter = (customProperty) => {
+const validateParamId = (customProperty) => {
     return (req, res, next, id) => {
         try{
             if(validateId(id)){
@@ -44,7 +44,7 @@ const validateIdParameter = (customProperty) => {
 };
 
 //Validates the balance format in req body and attatches it to req.transferBalance
-const validateTransferBudget = (req, res, next) => {
+const validateReqTransferBudget = (req, res, next) => {
     try{
         if(validateBudget(req.body.transferBudget)){
 //************Does this need to be changed to number? like before? try transferring the same budget twice to see */
@@ -59,8 +59,8 @@ const validateTransferBudget = (req, res, next) => {
 };
 
 module.exports = {
-    validateEnvelopeData,
-    validateIdParameter,
-    validateTransferBudget
+    validateReqEnvelope,
+    validateParamId,
+    validateReqTransferBudget
 };
 

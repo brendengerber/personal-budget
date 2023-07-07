@@ -5,6 +5,8 @@
 //Imports necessary modules
 const {pool} = require('../queries.js');
 
+//************Add callback to pool query for error and respons? */
+
 //Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
 const findEntry = async (table, searchId) => {
     try{
@@ -18,49 +20,75 @@ const findEntry = async (table, searchId) => {
 //Adds an entry to the specified table
 //Uses the properties of the entry object to create a custom paramaterized query statement
 //Entry properties must match the columns of the INSERT query
+//*****************loop can be a function for reuse since it's used elsewhwere */
 const addEntry = async (entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
-        let values = [];
+        let values = Object.values(entry);
+        let numberedPlaceholders = [];
         for(let i = 1; i <= queryParameters.length; i++){
-            values.push(`$${i}`);
+            numberedPlaceholders.push(`$${i}`);
         }
-        let addedEntry = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${values.join(', ')}) RETURNING *`, [entry.category, entry.budget]);
+        let addedEntry = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${numberedPlaceholders.join(', ')}) RETURNING *`, values);
         return addedEntry.rows[0];
     }catch(err){
         throw err;
     };
 };
-   
 
+//********what is response if it doesnt exist? catch(err){if (err.code === something) {return false} } */
+//****this is sending an envelope even if there is an error due to no id existing */
+//******kind of weird to have id and entry.id, can we refactor and remove it from entry? probably that has to be done in assemble envelope, and might mess up other stuff, I think it would work to just cut id out of the envleope, so submitted envleps never have an id */
+const updateEntry = async (entry, table) => {
+    try{
+        //Creates the array of queryParameters
+        let queryParameters = Object.getOwnPropertyNames(entry);
+        
+        //Creates the array of values with id at the end
+        let values = Object.values(entry);
+        values.push(values.shift());
 
+        //Creates the array used to create the SET string
+        let queryParametersAndnumberedPlaceholders = [];
+        let numberedPlaceholdersCounter = 1;
+        for(let parameter of queryParameters.slice(1)){
+            queryParametersAndnumberedPlaceholders.push(`${parameter} = $${numberedPlaceholdersCounter}`);
+            numberedPlaceholdersCounter ++;
+        };
 
+        let updatedEntry = await pool.query(`UPDATE ${table} SET ${queryParametersAndnumberedPlaceholders.join(', ')} WHERE id = $${numberedPlaceholdersCounter}`, values);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const updateEntry = (id, newEnvelope) => {
-    let index = findEntryIndex(id);
-    if(index || index === 0){
-        envelopes[index] = newEnvelope;
-        return envelopes[index]
+        return updatedEntry.rows[0];
+    }catch(err){
+        throw err;
     }
-    return false
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const deleteEntry = (id) => {
     let index = findEntryIndex(id)  ;  
