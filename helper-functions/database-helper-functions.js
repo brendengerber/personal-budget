@@ -16,6 +16,9 @@ const findEntry = async (table, searchId) => {
     };
 };
 
+//Adds an entry to the specified table
+//Uses the properties of the entry object to create a custom paramaterized query statement
+//Entry properties must match the columns of the INSERT query
 const addEntry = async (entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
