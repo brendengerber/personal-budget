@@ -16,17 +16,20 @@ const findEntry = async (table, searchId) => {
     };
 };
 
-//********refactor to loop through properties instead of being specific to envelope */
 const addEntry = async (entry, table) => {
     try{
-        let addedEntry = await pool.query(`INSERT INTO ${table} (category, budget) VALUES ($1, $2) RETURNING *`, [entry.category, entry.budget]);
+        let queryParameters = Object.getOwnPropertyNames(entry);
+        let values = [];
+        for(let i = 1; i <= queryParameters.length; i++){
+            values.push(`$${i}`);
+        }
+        let addedEntry = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${values.join(', ')}) RETURNING *`, [entry.category, entry.budget]);
         return addedEntry.rows[0];
     }catch(err){
         throw err;
     };
 };
    
-
 
 
 
