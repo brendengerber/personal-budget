@@ -1,7 +1,7 @@
 //Imports necessary modules
 const express = require('express');
 const {validateEnvelopeData, validateIdParameter, validateTransferBudget} = require('../custom-middleware/validation-middleware.js');
-const {attatchEnvelopeById, addEnvelope, assignEnvelopeId, assembleEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
+const {attatchEnvelopeById, addEnvelope, assembleEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
@@ -23,7 +23,7 @@ envelopesRouter.get('/:id', attatchEnvelopeById, (req, res, next) => {
 
 //Posts a new envelope
 //Body must be the new envelope in the form of a JSON object: {"category": string, "budget": number,}
-envelopesRouter.post('/', validateEnvelopeData, assignEnvelopeId, addEnvelope, (req, res, next) => {
+envelopesRouter.post('/', validateEnvelopeData, addEnvelope, (req, res, next) => {
     res.send(req.envelope);
 });
 

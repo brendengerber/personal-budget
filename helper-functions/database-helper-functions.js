@@ -16,35 +16,11 @@ const findEntry = async (table, searchId) => {
     };
 };
 
-//** needs refactoring */
-const assignEntryId = async (table) => {
-    try{
-        let newId;
-        let unique = undefined;
-
-        //Continues generating v4 UUIDs until a unique one is generated
-        while(!unique){
-            newId = crypto.randomUUID();
-            let exists = await findEntry(table, newId);
-            if(!exists){
-                unique = true;
-            }
-            
-        }
-        //Reserves the v4 UUID so it cannot be taken by another request coming in before processing has been completed
-        //********** need to probably reserve this with a blank add, then use update instead of insert for POST   
-
-        //Returns the v4 UUID for use in consequent functions and middleware
-        return newId;
-    }catch(err){
-        throw err;
-    }
-};
-
+//********refactor to loop through properties instead of being specific to envelope */
 const addEntry = async (entry, table) => {
     try{
-        await pool.query(`INSERT INTO ${table} (id, category, budget) VALUES ($1, $2, $3) RETURNING *`, [entry.id, entry.category, entry.budget]);
-        return;
+        let addedEntry = await pool.query(`INSERT INTO ${table} (category, budget) VALUES ($1, $2) RETURNING *`, [entry.category, entry.budget]);
+        return addedEntry.rows[0];
     }catch(err){
         throw err;
     };
@@ -100,7 +76,6 @@ const updateEntryBudget = (id, transferBudget) => {
 
 module.exports = {
     findEntry,
-    assignEntryId,
     addEntry,
     updateEntry,
     deleteEntry,
