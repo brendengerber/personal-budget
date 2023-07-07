@@ -4,7 +4,6 @@
 
 //Imports necessary modules
 const {pool} = require('../queries.js');
-const crypto = require('crypto');
 
 //Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
 const findEntry = async (table, searchId) => {
