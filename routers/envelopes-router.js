@@ -21,7 +21,7 @@ envelopesRouter.get('/:id', attatchEnvelopeById, (req, res, next) => {
     res.send(req.envelope);
 });
 
-//Posts a new envelope
+//Posts a new envelope and sends the newly generated v4 UUID
 //Body must be the new envelope in the form of a JSON object: {"category": string, "budget": number,}
 envelopesRouter.post('/', validateReqEnvelope, addEnvelope, (req, res, next) => {
     res.send(req.envelope);

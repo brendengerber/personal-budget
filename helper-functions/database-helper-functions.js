@@ -20,7 +20,6 @@ const findEntry = async (table, searchId) => {
 //Adds an entry to the specified table
 //Uses the properties of the entry object to create a custom paramaterized query statement
 //Entry properties must match the columns of the INSERT query
-//*****************loop can be a function for reuse since it's used elsewhwere */
 const addEntry = async (entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
@@ -36,9 +35,6 @@ const addEntry = async (entry, table) => {
     };
 };
 
-//********what is response if it doesnt exist? catch(err){if (err.code === something) {return false} } */
-//****this is sending an envelope even if there is an error due to no id existing */
-//******kind of weird to have id and entry.id, can we refactor and remove it from entry? probably that has to be done in assemble envelope, and might mess up other stuff, I think it would work to just cut id out of the envleope, so submitted envleps never have an id */
 const updateEntry = async (entry, table) => {
     try{
         //Creates the array of queryParameters
@@ -56,7 +52,7 @@ const updateEntry = async (entry, table) => {
             numberedPlaceholdersCounter ++;
         };
 
-        let updatedEntry = await pool.query(`UPDATE ${table} SET ${queryParametersAndnumberedPlaceholders.join(', ')} WHERE id = $${numberedPlaceholdersCounter}`, values);
+        let updatedEntry = await pool.query(`UPDATE ${table} SET ${queryParametersAndnumberedPlaceholders.join(', ')} WHERE id = $${numberedPlaceholdersCounter} RETURNING *`, values);
 
         return updatedEntry.rows[0];
     }catch(err){

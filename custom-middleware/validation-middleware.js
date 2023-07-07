@@ -5,6 +5,7 @@
 const {validateBudget, validateId} = require('../helper-functions/validation-helper-functions.js');
 
 //*********************NEEDS REFACTORING TO USE SCHEMA in helper function */
+//***********also have two, validateNewReqEnvelope and validateReqEnvelope, the first should not include an id and attatch it to req.newEnvelope, the second should be for existing envelopes (PUT, etc), and should attatch everything to req.envelope (req.envelope always has id) */
 //Validates the envelope format in req body and attatches it to req.envelope
 const validateReqEnvelope = (req, res, next) => {
     try{

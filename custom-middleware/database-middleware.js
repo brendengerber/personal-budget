@@ -14,14 +14,13 @@ const {findEntry, addEntry, updateEntry, deleteEntry, updateEntryBudget} = requi
 //Adds an envelope
 const addEnvelope = async (req, res, next) => {
     try{
-        //Updates the attached envelope to include the newly assigned v4 UUID
+        //Sets req.envelope to the newly created database entry including its assigned v4 UUID
         req.envelope = await addEntry(req.envelope, 'envelopes');
         next();
     }catch (err){
         next(err);
     }
 };
-
 
 // Checks if an envelope exists by id, attatches it to the req object, and sends a 404 error if it does not exist
 const attatchEnvelopeById =  async (req, res, next) => {
