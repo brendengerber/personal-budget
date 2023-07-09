@@ -5,13 +5,20 @@
 //Imports necessary modules
 const {pool} = require('../queries.js');
 
-//************Add callback to pool query for error and respons? */
-
-//Returns the entry with the request id if it exists, if not it will return undefined allowing middleware to send a 404
-const findEntry = async (table, searchId) => {
+//Finds and returns the entry with the requested id
+const findEntry = async (id, table) => {
     try{
-        let result = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [searchId]);
-        return result.rows[0];
+        //Queries the database to find the entry of the specified id and returns the result
+        let result = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [id]);
+        if(result.rows[0]){
+            return result.rows[0];
+
+        //Throws a 404 Error if the entry does not exist
+        }else{
+            const err = new Error(`Error: envelope with ID ${id} does not exist.`);
+            err.status = 404;
+            throw err;
+        }
     }catch(err){
         throw err;
     };
@@ -20,6 +27,7 @@ const findEntry = async (table, searchId) => {
 //Adds an entry to the specified table and returns the newly assigned v4 UUID
 //Uses the properties of the entry object to create a custom paramaterized query statement
 //Entry properties must match the columns of the INSERT query
+//*******add id arg to match even though it is in entry? */
 const addEntry = async (entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
@@ -33,6 +41,7 @@ const addEntry = async (entry, table) => {
             numberedPlaceholders.push(`$${i}`);
         }
 
+        //Queries the database to add the entry and returns the result
         let result = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${numberedPlaceholders.join(', ')}) RETURNING *`, values);
         return result.rows[0];
     }catch(err){
@@ -52,8 +61,18 @@ const updateEntry = async (entry, table) => {
             setStringArray.push(`${queryParameters[i-1]} = $${i}`);
         };
 
+        //Queries the database to update the entry of the specified id and returns the result
         let result = await pool.query(`UPDATE ${table} SET ${setStringArray.join(', ')} WHERE id = $1 RETURNING *`, values);
-        return result.rows[0];
+        if(result.rows[0]){
+            return result.rows[0];
+
+        //Throws a 404 Error if the entry does not exist
+        }else{
+            const err = new Error(`Error: envelope with ID ${entry.id} does not exist.`);
+            err.status = 404;
+            throw err;
+        }
+        
     }catch(err){
         throw err;
     }
@@ -66,32 +85,29 @@ const updateEntry = async (entry, table) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const deleteEntry = (id) => {
-    let index = findEntryIndex(id)  ;  
-    if(index || index === 0){
-        return envelopes.splice(index, 1);
+const deleteEntry = async (id) => {
+    try{
+        let result = await pool.query(``)
+        return result.rows[0].id
+    }catch(err){
+        `No envelope with ID ${id} exists.`
     }
-    return false
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const updateEntryBudget = (id, transferBudget) => {
     let index = findEntryIndex(id);

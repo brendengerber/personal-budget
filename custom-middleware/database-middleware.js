@@ -21,21 +21,19 @@ const addEnvelope = async (req, res, next) => {
     }
 };
 
-// Checks if an envelope exists by id, attatches it to the req object, and sends a 404 error if it does not exist
+// Checks if an envelope exists by id, attatches it to the req object
 const findEnvelopeById =  async (req, res, next) => {
     try{
         //Sets req.envelope to the envelope that corisponds with the id
-        req.envelope =  await findEntry('envelopes', req.id);
-        if(req.envelope){
-            return next();
-        }
-        res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
+        req.envelope =  await findEntry(req.id, 'envelopes');
+        next();
     }catch(err){
         next(err);
     }
 };
 
 //Updates the envelope with the specified id with a specified new envelope
+//New envelope can either include or not include it's id, if it is included it will check to make sure it matches the parameter id
 const updateEnvelopeById = async (req, res, next) => {
     try{
         req.envelope = await updateEntry(req.envelope, 'envelopes');
@@ -71,12 +69,10 @@ const updateEnvelopeById = async (req, res, next) => {
 
 
 //Deletes the envelope of the specified id
-const deleteEnvelopeById = (req, res, next) => {
+const deleteEnvelopeById = async (req, res, next) => {
     try{
-        if(deleteEntry(req.id)){
-            return next();
-        }
-        res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
+        deleteEntry(req.id);
+        next();
     }catch(err){
         next(err);
     }

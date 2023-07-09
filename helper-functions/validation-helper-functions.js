@@ -91,7 +91,6 @@ const validateEnvelope = function(envelope, id){
 
         //Checks if any errors have been recorded and if not, returns the envelope
         if(validationErrors.length === 0){
-            console.log(envelope)
             return envelope;
 
         //In case of errors, creates and throws a new error object describing all invalid formatting
