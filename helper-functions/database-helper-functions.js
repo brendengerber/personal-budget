@@ -2,6 +2,8 @@
 //These functions return false if the resource does not exist which allows middleware to check existance using an if statement and sending a 404 if it is false
 //These functions are separate from the middleware. If we change where a resource is located it will need new code to manipulate it, that code can go here, leaving the actual routers untouched as the new functions will return the same results as before.
 
+//***********do these need to have catch(err){throw err} ????  or will it be thrown and caught by the next one?  remove the catch, turn database off, and test*/
+
 //Imports necessary modules
 const {pool} = require('../queries.js');
 
@@ -15,7 +17,7 @@ const findEntry = async (id, table) => {
 
         //Throws a 404 Error if the entry does not exist
         }else{
-            const err = new Error(`Error: envelope with ID ${id} does not exist.`);
+            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${id} does not exist.`);
             err.status = 404;
             throw err;
         }
@@ -50,7 +52,7 @@ const addEntry = async (entry, table) => {
 };
 
 //Entry must be an object that begins with an id property
-const updateEntry = async (entry, table) => {
+const updateEntry = async (id, entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
         let values = Object.values(entry);
@@ -68,7 +70,7 @@ const updateEntry = async (entry, table) => {
 
         //Throws a 404 Error if the entry does not exist
         }else{
-            const err = new Error(`Error: envelope with ID ${entry.id} does not exist.`);
+            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${entry.id} does not exist.`);
             err.status = 404;
             throw err;
         }
@@ -85,12 +87,21 @@ const updateEntry = async (entry, table) => {
 
 
 
-const deleteEntry = async (id) => {
+const deleteEntry = async (id, table) => {
     try{
-        let result = await pool.query(``)
-        return result.rows[0].id
+        //Queries the database to delete the entry of the specified id
+        let result = await pool.query(`DELETE FROM ${table} WHERE id = $1`, [id]);
+        if(result.rowCount > 0){
+            return
+        
+        //Throws a 404 Error if the entry does not exist
+        }else{
+            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${id} does not exist.`);
+            err.status = 404;
+            throw err;
+        }
     }catch(err){
-        `No envelope with ID ${id} exists.`
+        throw err;
     }
 };
 

@@ -1,8 +1,5 @@
 //All the actual deleting, updating, etc are performed the database-helper-functions so they can be reused
 //For example the budget transfer middleware uses an update function, which is also used in the middleware that updates a single envelope
-//Those functions will return false if the resource does not exist 
-//To minimize calls to the database, all checks for the existance of a resource will occur in each middleware that accesses the database 
-//This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
 //************Change export and import orders to match the order in this file
 //**********Update comments to match  */
 
@@ -21,7 +18,7 @@ const addEnvelope = async (req, res, next) => {
     }
 };
 
-// Checks if an envelope exists by id, attatches it to the req object
+//Checks if an envelope exists by id, attatches it to the req object
 const findEnvelopeById =  async (req, res, next) => {
     try{
         //Sets req.envelope to the envelope that corisponds with the id
@@ -36,7 +33,7 @@ const findEnvelopeById =  async (req, res, next) => {
 //New envelope can either include or not include it's id, if it is included it will check to make sure it matches the parameter id
 const updateEnvelopeById = async (req, res, next) => {
     try{
-        req.envelope = await updateEntry(req.envelope, 'envelopes');
+        req.envelope = await updateEntry(req.id, req.envelope, 'envelopes');
         if(req.envelope){
             return next();
         }
@@ -46,37 +43,28 @@ const updateEnvelopeById = async (req, res, next) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Deletes the envelope of the specified id
 const deleteEnvelopeById = async (req, res, next) => {
     try{
-        deleteEntry(req.id);
+        await deleteEntry(req.id, 'envelopes');
         next();
     }catch(err){
         next(err);
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Transfers the specified budget from the specified envelope to the second specified envelope
 //**********needs refactoring to asyn for findEntry */
