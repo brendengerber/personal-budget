@@ -5,7 +5,6 @@
 //This is done in the form of an if statement that checks if the database-helper-function returns false or a resource
 //************Change export and import orders to match the order in this file
 //**********Update comments to match  */
-//**********have addentry helper function return the envelope (including the newly created id), and have addenvelope attatch the new envelope to req.envelope for the final router to send it
 
 
 //Imports database helper functions
@@ -23,7 +22,7 @@ const addEnvelope = async (req, res, next) => {
 };
 
 // Checks if an envelope exists by id, attatches it to the req object, and sends a 404 error if it does not exist
-const attatchEnvelopeById =  async (req, res, next) => {
+const findEnvelopeById =  async (req, res, next) => {
     try{
         //Sets req.envelope to the envelope that corisponds with the id
         req.envelope =  await findEntry('envelopes', req.id);
@@ -31,19 +30,6 @@ const attatchEnvelopeById =  async (req, res, next) => {
             return next();
         }
         res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
-    }catch(err){
-        next(err);
-    }
-};
-
-//Assembles an envelope object from the req properties
-const assembleEnvelope = (req, res, next) => {
-    try{
-        req.envelope = {};
-        req.envelope.id = req.id;
-        req.envelope.category = req.category;
-        req.envelope.budget = req.budget;
-        next();
     }catch(err){
         next(err);
     }
@@ -61,7 +47,6 @@ const updateEnvelopeById = async (req, res, next) => {
         next(err);
     }
 };
-
 
 
 
@@ -137,9 +122,8 @@ const transferEnvelopeBudget = (req, res, next) => {
 };
 
 module.exports = {
-    attatchEnvelopeById,
     addEnvelope,
-    assembleEnvelope,
+    findEnvelopeById,
     deleteEnvelopeById,
     updateEnvelopeById,
     transferEnvelopeBudget

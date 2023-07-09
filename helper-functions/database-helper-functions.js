@@ -17,23 +17,24 @@ const findEntry = async (table, searchId) => {
     };
 };
 
-//Adds an entry to the specified table
+//Adds an entry to the specified table and returns the newly assigned v4 UUID
 //Uses the properties of the entry object to create a custom paramaterized query statement
 //Entry properties must match the columns of the INSERT query
 const addEntry = async (entry, table) => {
     try{
         let queryParameters = Object.getOwnPropertyNames(entry);
+        queryParameters = queryParameters.slice(1);
         let values = Object.values(entry);
-        
+        values = values.slice(1);
+
         //Creates the array used to create the VALUES string
         let numberedPlaceholders = [];
         for(let i = 1; i <= queryParameters.length; i++){
             numberedPlaceholders.push(`$${i}`);
         }
 
-        let addedEntry = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${numberedPlaceholders.join(', ')}) RETURNING *`, values);
-        
-        return addedEntry.rows[0];
+        let result = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${numberedPlaceholders.join(', ')}) RETURNING *`, values);
+        return result.rows[0];
     }catch(err){
         throw err;
     };
@@ -51,9 +52,8 @@ const updateEntry = async (entry, table) => {
             setStringArray.push(`${queryParameters[i-1]} = $${i}`);
         };
 
-        let updatedEntry = await pool.query(`UPDATE ${table} SET ${setStringArray.join(', ')} WHERE id = $1 RETURNING *`, values);
-
-        return updatedEntry.rows[0];
+        let result = await pool.query(`UPDATE ${table} SET ${setStringArray.join(', ')} WHERE id = $1 RETURNING *`, values);
+        return result.rows[0];
     }catch(err){
         throw err;
     }
