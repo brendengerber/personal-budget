@@ -123,9 +123,9 @@ const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableNam
 
         try{
             //Updates the entries and returns if successful
-            await incrementEntryColumn(fromEntryId, columnName, tableName, -amountToTransfer);
-            await incrementEntryColumn(toEntryId, columnName, tableName, amountToTransfer);
-            return;
+            let fromEntryUpdated = await incrementEntryColumn(fromEntryId, columnName, tableName, -amountToTransfer);
+            let toEntryUpdated = await incrementEntryColumn(toEntryId, columnName, tableName, amountToTransfer);
+            return [fromEntryUpdated, toEntryUpdated];
     
         }catch(err){
             //Resets the entries in case there was an error and throws it

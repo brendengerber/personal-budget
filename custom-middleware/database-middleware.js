@@ -65,7 +65,7 @@ const deleteEnvelopeById = async (req, res, next) => {
 //Transfers a specified budget from a specified envelope to a second specified envelope
 const transferEnvelopeBudgetByIds = async (req, res, next) => {
     try{
-        await transferColumnAmount(req.fromId, req.toId, "budget", "envelopes", req.transferBudget);
+        req.updatedEnvelopes = await transferColumnAmount(req.fromId, req.toId, "budget", "envelopes", req.transferBudget);
         next();
     }catch(err){
         next(err);
