@@ -3,7 +3,7 @@
 //Imports necessary modules
 const express = require('express');
 const {validateEnvelopeReq, validateIdParam, validateReqTransferBudget} = require('../custom-middleware/validation-middleware.js');
-const {ruturnAllEnvelopes, findEnvelopeById, addEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
+const {getAllEnvelopes, getEnvelopeById, addEnvelope, updateEnvelopeById, deleteEnvelopeById, transferEnvelopeBudgetByIds} = require('../custom-middleware/database-middleware.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
@@ -15,12 +15,12 @@ envelopesRouter.param('to', validateIdParam('toId'));
 
 //Gets all envelopes
 //*******************needs refactor to use database */
-envelopesRouter.get('/', ruturnAllEnvelopes, (req, res, next) => {
+envelopesRouter.get('/', getAllEnvelopes, (req, res, next) => {
     res.send(req.envelopes);
 });
 
 //Gets an envelope with the specified id
-envelopesRouter.get('/:id', findEnvelopeById, (req, res, next) => {
+envelopesRouter.get('/:id', getEnvelopeById, (req, res, next) => {
     res.send(req.envelope);
 });
 
@@ -43,13 +43,13 @@ envelopesRouter.delete('/:id', deleteEnvelopeById, (req, res, next) => {
 
 //Transfers the specified budget from the specified envelope to the second specified envelope
 //Body must be the transfer amount in the form of a JSON object: {"transferBudget": 2000}
-envelopesRouter.put('/:from/transfer/:to', validateReqTransferBudget, transferEnvelopeBudget,(req, res, next) => {
+envelopesRouter.put('/:from/transfer/:to', validateReqTransferBudget, transferEnvelopeBudgetByIds,(req, res, next) => {
     res.send({message: `The budget of ${req.transferBudget} has been transferred from ID ${req.fromId} to ID ${req.toId}.`});
 });
 
 //**********needs refactoring? and it's own middleware */
 envelopesRouter.put('/test',(req, res, next) => {
-    updateEnvelopeBudget()
+    updateEnvelopeBudget();
     res.send({message: `success`});
 });
 

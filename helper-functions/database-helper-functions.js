@@ -5,10 +5,10 @@
 //As long as the table exists, the id exists, and columns present in the entry object's properties exist, the query will succeed
 
 //Imports necessary modules
-const {db} = require('../queries.js')
+const {db} = require('../queries.js');
 
 //Returns an array of all entries of a table
-const returnAllEntries = async (tableName) => {
+const getAllEntries = async (tableName) => {
     let result = await db.query('SELECT * FROM $1:name', [tableName]);
     if(result.length > 0){
         return result;
@@ -20,7 +20,7 @@ const returnAllEntries = async (tableName) => {
 };
 
 //Finds and returns the entry with the requested id
-const findEntry = async (entryId, tableName) => {
+const getEntry = async (entryId, tableName) => {
     
     //Queries the database to find the entry of the specified id and returns the result
     let result = await db.query('SELECT * FROM $1:name WHERE id = $2', [tableName, entryId]);
@@ -118,8 +118,8 @@ const incrementEntryColumn = async (entryId, columnName, tableName, amountToIncr
     
 const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableName, amountToTransfer) => {
         //Checks that the original entries exist and saves them
-        let fromEntryOriginal = await findEntry(fromEntryId, tableName);
-        let toEntryOriginal = await findEntry(toEntryId, tableName);
+        let fromEntryOriginal = await getEntry(fromEntryId, tableName);
+        let toEntryOriginal = await getEntry(toEntryId, tableName);
 
         try{
             //Updates the entries and returns if successful
@@ -136,8 +136,8 @@ const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableNam
 };
 
 module.exports = {
-    returnAllEntries,
-    findEntry,
+    getAllEntries,
+    getEntry,
     addEntry,
     updateEntry,
     deleteEntry,

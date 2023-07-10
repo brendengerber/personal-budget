@@ -1,16 +1,26 @@
 //All the actual deleting, updating, etc are performed the database-helper-functions so they can be reused
 //For example the budget transfer middleware uses an update function, which is also used in the middleware that updates a single envelope
-//************Change export and import orders to match the order in this file
 //**********Update comments to match  */
 
 
 //Imports database helper functions
-const {returnAllEntries, findEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
+const {getAllEntries, getEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
 
-//
-const ruturnAllEnvelopes = async (req, res, next) => {
+//Gets all envelopes and adds them to req.envelopes
+const getAllEnvelopes = async (req, res, next) => {
     try{
-        req.envelopes = await returnAllEntries('envelopes');
+        req.envelopes = await getAllEntries('envelopes');
+        next();
+    }catch(err){
+        next(err);
+    }
+};
+
+//Checks if an envelope exists by id, attatches it to the req object
+const getEnvelopeById =  async (req, res, next) => {
+    try{
+        //Sets req.envelope to the envelope that corisponds with the id
+        req.envelope =  await getEntry(req.id, 'envelopes');
         next();
     }catch(err){
         next(err);
@@ -24,17 +34,6 @@ const addEnvelope = async (req, res, next) => {
         req.envelope = await addEntry(req.envelope, 'envelopes');
         next();
     }catch (err){
-        next(err);
-    }
-};
-
-//Checks if an envelope exists by id, attatches it to the req object
-const findEnvelopeById =  async (req, res, next) => {
-    try{
-        //Sets req.envelope to the envelope that corisponds with the id
-        req.envelope =  await findEntry(req.id, 'envelopes');
-        next();
-    }catch(err){
         next(err);
     }
 };
@@ -63,27 +62,8 @@ const deleteEnvelopeById = async (req, res, next) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Transfers the specified budget from the specified envelope to the second specified envelope
-//**********needs refactoring to asyn for findEntry */
-//*********move transfer logic to helper functions? */
-//*********needs to build an error if both envelopes dont exist somehow */
-const transferEnvelopeBudget = async (req, res, next) => {
-    //Saves the original envelopes
+//Transfers a specified budget from a specified envelope to a second specified envelope
+const transferEnvelopeBudgetByIds = async (req, res, next) => {
     try{
         await transferColumnAmount(req.fromId, req.toId, "budget", "envelopes", req.transferBudget);
         next();
@@ -93,11 +73,10 @@ const transferEnvelopeBudget = async (req, res, next) => {
 };
 
 module.exports = {
-    ruturnAllEnvelopes,
+    getAllEnvelopes,
+    getEnvelopeById,
     addEnvelope,
-    findEnvelopeById,
-    deleteEnvelopeById,
     updateEnvelopeById,
-    transferEnvelopeBudget
+    deleteEnvelopeById,
+    transferEnvelopeBudgetByIds
 };
-
