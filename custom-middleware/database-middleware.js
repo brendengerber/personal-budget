@@ -1,5 +1,5 @@
-//All the actual deleting, updating, etc are performed the database-helper-functions so they can be reused
-//For example the budget transfer middleware uses an update function, which is also used in the middleware that updates a single envelope
+//Route functionality is kept here in seperate middleware functions to maintain separation of concerns and allow for re-use in multiple routes
+//Middleware functions are in charge of calling the correct helper functions with the correct arguments and attatching results to the req object
 
 //Imports database helper functions
 const {getAllEntries, getEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
@@ -14,10 +14,9 @@ const getAllEnvelopes = async (req, res, next) => {
     }
 };
 
-//Checks if an envelope exists by id, attatches it to the req object
+//Gets the envelope of the specified id and attatches it to req.envelope
 const getEnvelopeById =  async (req, res, next) => {
     try{
-        //Sets req.envelope to the envelope that corisponds with the id
         req.envelope =  await getEntry(req.id, 'envelopes');
         next();
     }catch(err){
@@ -25,32 +24,28 @@ const getEnvelopeById =  async (req, res, next) => {
     }
 };
 
-//Adds an envelope
+//Adds an envelope, assigns it a v4 UUID, and attatches the updated envelope to req.envelope
 const addEnvelope = async (req, res, next) => {
     try{
-        //Sets req.envelope to the newly created database entry including its assigned v4 UUID
-        req.envelope = await addEntry(req.id, req.envelope, 'envelopes');
+        req.envelope = await addEntry(req.envelope, 'envelopes');
         next();
     }catch (err){
         next(err);
     }
 };
 
-//Updates the envelope with the specified id with a specified new envelope
+//Updates the envelope of the specified id with a new envelope and attatches the updated envelope including id to req.envelope
 //New envelope can either include or not include it's id, if it is included it will check to make sure it matches the parameter id
 const updateEnvelopeById = async (req, res, next) => {
     try{
         req.envelope = await updateEntry(req.id, req.envelope, 'envelopes');
-        if(req.envelope){
-            return next();
-        }
-        res.status(404).send({message: `No envelope with ID ${req.id} exists.`});
+        next();
     }catch(err){
         next(err);
     }
 };
 
-//Deletes the envelope of the specified id and 
+//Deletes the envelope of the specified id and attatches the deleted envelope to req.envelopeDeleted
 const deleteEnvelopeById = async (req, res, next) => {
     try{
         req.envelopeDeleted  = await deleteEntry(req.id, 'envelopes');
@@ -60,7 +55,7 @@ const deleteEnvelopeById = async (req, res, next) => {
     }
 };
 
-//Transfers a specified budget from a specified envelope to a second specified envelope
+//Transfers a specified budget from one specified envelope to a second specified envelope and attatches an array of the updated envelopes to req.updatedEnvelopes
 const transferEnvelopeBudgetByIds = async (req, res, next) => {
     try{
         req.updatedEnvelopes = await transferColumnAmount(req.fromId, req.toId, "budget", "envelopes", req.transferBudget);
@@ -70,6 +65,7 @@ const transferEnvelopeBudgetByIds = async (req, res, next) => {
     }
 };
 
+//Exports the functions for use in other modules
 module.exports = {
     getAllEnvelopes,
     getEnvelopeById,

@@ -8,7 +8,7 @@ const apiRouter = express.Router();
 const envelopesRouter = require('./routers/envelopes-router.js');
 apiRouter.use('/envelopes', envelopesRouter);
 
-//Handles errors
+//Handles all errors
 apiRouter.use((err, req, res, next) => {
     if(!err.status){
       err.status = 500;
