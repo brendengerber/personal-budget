@@ -5,7 +5,7 @@
 
 
 //Imports database helper functions
-const {findEntry, addEntry, updateEntry, deleteEntry, incrementEntryColumn, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
+const {findEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope
 const addEnvelope = async (req, res, next) => {
@@ -63,7 +63,9 @@ const deleteEnvelopeById = async (req, res, next) => {
 
 
 
-// incrementEntryColumn = async (entryId, columnName, tableName, amountToIncrement)
+
+
+
 
 
 //Transfers the specified budget from the specified envelope to the second specified envelope

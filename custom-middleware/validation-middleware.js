@@ -2,7 +2,7 @@
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted.
 
 //Imports necessary modules
-const {validateMoney, validateId, validateEnvelope} = require('../helper-functions/validation-helper-functions.js');
+const {validateId, validateEnvelope, validateBudget} = require('../helper-functions/validation-helper-functions.js');
 
 //Validates the format of an envelope submitted in the req.body and attatches it to req.envelope
 const validateEnvelopeReq = (req, res, next) => {
@@ -31,20 +31,12 @@ const validateIdParam = (customProperty) => {
 
 //Validates the balance format in req body and attatches it to req.transferBalance
 const validateReqTransferBudget = (req, res, next) => {
-    req.transferBudget = req.body.budget
-    next();
-//     try{
-//         //************* validateMoney now returns an error instead of false, refactor here accordingly
-//         if(validateMoney(req.body.transferBudget)){
-// //************Does this need to be changed to number? like before? try transferring the same budget twice to see */
-//             req.transferBudget = req.body.transferBudget;
-//             next();
-//         }else{
-//             res.status(400).send({message: `Error: ${req.body.transferBudget} is an invalid budget.`});
-//         }
-    // }catch(err){
-    //     next(err);
-    // }
+    try{
+        req.transferBudget = validateBudget(req.body).budget;
+        next();
+    }catch(err){
+        next(err);
+    }
 };
 
 module.exports = {

@@ -46,10 +46,10 @@ const envelopeSchema = new Schema({
 //First argument is an envelope object to validate
 //Second argument is an optional id if you want to test that the envelope in question matches a certain id (i.e. an id sent via parameters etc)
 //Can be used to validate existing envelopes with assigned v4 UUID or new envelopes awaiting assignment
-//Successfully validated envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxx.xx number}
+//A successfully validated envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxx.xx number}
 const validateEnvelope = function(envelope, id){
     let validationErrors;
-    //Validates the format of the envelope and sets validationErrors equal to the array of errors if any
+    //Validates the format of the envelope and sets validationErrors equal to an array of errors if any
     validationErrors = envelopeSchema.validate(envelope);
 
     //Checks that the body id property is a valid v4 UUID if it exists
@@ -92,9 +92,47 @@ const validateEnvelope = function(envelope, id){
     }
 };
 
+//Creates a schema to validate budget objects
+const budgetSchema = new Schema({
+    budget: {
+        type: Number,
+        required: true    
+    }
+}, {strict: true});
+
+//Validates a budget object
+//Budget object should conform to 
+//A successfully validated budget will conform to {budget: xxx.xx number}
+const validateBudget = function (budget){
+    let validationErrors;
+    //Validates the format of the budget and sets validationErrors equal to an array of errors if any
+    validationErrors = budgetSchema.validate(budget);
+    
+    //Checks that the budget follows the xxxx.xx format
+    try{
+        validateMoney(budget.budget);
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    
+    //Checks if any errors have been recorded and if not, returns the budget
+    if(validationErrors.length === 0){
+        return budget;
+
+    //In case of errors, creates and throws a new error object describing all invalid formatting
+    }else{
+        const err = new Error(`The budget format is invalid.\n ${validationErrors.join("\n")}`);
+        err.status = 400;
+        throw err;
+    }
+};
+
+
+
 //Exports functions to be used in other modules
 module.exports = {
     validateMoney,
     validateId,
-    validateEnvelope
+    validateEnvelope,
+    validateBudget
 };
