@@ -1,23 +1,24 @@
 //This file contains helper functions that manipulate the database in some way and can be used by routers
 //These functions return false if the resource does not exist which allows middleware to check existance using an if statement and sending a 404 if it is false
 //These functions are separate from the middleware. If we change where a resource is located it will need new code to manipulate it, that code can go here, leaving the actual routers untouched as the new functions will return the same results as before.
-
-//***********do these need to have catch(err){throw err} ????  or will it be thrown and caught by the next one?  remove the catch, turn database off, and test*/
+//***********do these need to have catch(err){throw err} ????  or will it be thrown and caught by the next one?  remove the catch, turn database off, and test*/ looks like can delete
+//Database functions are paramaterized and dynamic table/column names are escaped to avoid SQL injection 
+//As long as the table exists, the id exists, and columns present in the entry object's properties exist, the query will succeed
 
 //Imports necessary modules
-const {pool} = require('../queries.js');
+const {db} = require('../queries.js')
 
 //Finds and returns the entry with the requested id
-const findEntry = async (id, table) => {
+const findEntry = async (entryId, tableName) => {
     try{
         //Queries the database to find the entry of the specified id and returns the result
-        let result = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [id]);
-        if(result.rows[0]){
-            return result.rows[0];
+        let result = await db.query('SELECT * FROM $1:name WHERE id = $2', [tableName, entryId])
+        if(result[0]){
+            return result[0];
 
         //Throws a 404 Error if the entry does not exist
         }else{
-            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${id} does not exist.`);
+            const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${entryId} does not exist.`);
             err.status = 404;
             throw err;
         }
@@ -30,41 +31,96 @@ const findEntry = async (id, table) => {
 //Uses the properties of the entry object to create a custom paramaterized query statement
 //Entry properties must match the columns of the INSERT query
 //*******add id arg to match even though it is in entry? */
-const addEntry = async (entry, table) => {
+const addEntry = async (entry, tableName) => {
     try{
-        let queryParameters = Object.getOwnPropertyNames(entry);
-        queryParameters = queryParameters.slice(1);
-        let values = Object.values(entry);
-        values = values.slice(1);
-
-        //Creates the array used to create the VALUES string
-        let numberedPlaceholders = [];
-        for(let i = 1; i <= queryParameters.length; i++){
-            numberedPlaceholders.push(`$${i}`);
-        }
+        let columnsArray = Object.getOwnPropertyNames(entry);
+        columnsArray = columnsArray.slice(1);
+        let valuesArray = Object.values(entry);
+        valuesArray = valuesArray.slice(1);
 
         //Queries the database to add the entry and returns the result
-        let result = await pool.query(`INSERT INTO ${table} (${queryParameters.join(', ')}) VALUES (${numberedPlaceholders.join(', ')}) RETURNING *`, values);
-        return result.rows[0];
+        let result = await db.query("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
+            table: tableName,
+            columns: columnsArray,
+            values: valuesArray
+        });
+
+        return result[0];
     }catch(err){
         throw err;
     };
 };
 
 //Entry must be an object that begins with an id property
-const updateEntry = async (id, entry, table) => {
+const updateEntry = async (entryId, entry, tableName) => {
     try{
-        let queryParameters = Object.getOwnPropertyNames(entry);
-        let values = Object.values(entry);
+        let columnsArray = Object.getOwnPropertyNames(entry);
+        let valuesArray = Object.values(entry);
 
-        //Creates the array used to create the SET string
-        let setStringArray = [];
-        for(let i = 2; i <= queryParameters.length; i++){
-            setStringArray.push(`${queryParameters[i-1]} = $${i}`);
-        };
+        let result = await db.query("UPDATE ${table:name} SET (${columns:name}) = (${values:csv}) WHERE id = ${id:csv} RETURNING *", {
+            table: tableName,
+            columns: columnsArray,
+            values: valuesArray,
+            id: entryId
+        });
 
-        //Queries the database to update the entry of the specified id and returns the result
-        let result = await pool.query(`UPDATE ${table} SET ${setStringArray.join(', ')} WHERE id = $1 RETURNING *`, values);
+        if(result[0]){
+            return result[0];
+
+        //Throws a 404 Error if the entry does not exist
+        }else{
+            const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${id} does not exist.`);
+            err.status = 404;
+            throw err;
+        }
+        
+    }catch(err){
+        throw err;
+    }
+};
+
+const deleteEntry = async (entryId, tableName) => {
+    try{
+        //Queries the database to delete the entry of the specified id
+        let result = await db.query("DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *", {
+            table: tableName,
+            id: entryId
+        });
+        if(result.length === 1){
+            return;
+        
+        //Throws a 404 Error if the entry does not exist
+        }else{
+            const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${entryId} does not exist.`);
+            err.status = 404;
+            throw err;
+        }
+    }catch(err){
+        throw err;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const updateEntryColumn = async (id, column, value, table) => {
+    try{
+        let result = await pool.query(`UPDATE ${table} SET ${column} = $2 WHERE id = $1`, [id, value])
         if(result.rows[0]){
             return result.rows[0];
 
@@ -74,65 +130,39 @@ const updateEntry = async (id, entry, table) => {
             err.status = 404;
             throw err;
         }
-        
     }catch(err){
         throw err;
     }
 };
 
-
-
-
-
-
-
-
-const deleteEntry = async (id, table) => {
+const updateEnvelopeBudget = async (id, budget, table) => {
     try{
-        //Queries the database to delete the entry of the specified id
-        let result = await pool.query(`DELETE FROM ${table} WHERE id = $1`, [id]);
-        if(result.rowCount > 0){
-            return
-        
+        let result = await pool.query(`UPDATE ${table} SET ${column} = ${column} + ${budget} WHERE id = $1`, [id])
+        if(result.rows[0]){
+            return result.rows[0];
+
         //Throws a 404 Error if the entry does not exist
         }else{
-            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${id} does not exist.`);
+            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${entry.id} does not exist.`);
             err.status = 404;
             throw err;
         }
+
     }catch(err){
         throw err;
     }
-};
+}  
+    
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-const updateEntryBudget = (id, transferBudget) => {
-    let index = findEntryIndex(id);
-    if(index || index === 0){
-        envelopes[index].budget = envelopes[index].budget + transferBudget;
-        return envelopes[index];
-    }
-    return false
-};
 
 module.exports = {
     findEntry,
     addEntry,
     updateEntry,
     deleteEntry,
-    updateEntryBudget
+    updateEntryColumn
 };

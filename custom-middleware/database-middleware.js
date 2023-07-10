@@ -5,7 +5,7 @@
 
 
 //Imports database helper functions
-const {findEntry, addEntry, updateEntry, deleteEntry, updateEntryBudget} = require('../helper-functions/database-helper-functions.js');
+const {findEntry, addEntry, updateEntry, deleteEntry, updateEntryColumn} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope
 const addEnvelope = async (req, res, next) => {
@@ -46,7 +46,7 @@ const updateEnvelopeById = async (req, res, next) => {
 //Deletes the envelope of the specified id
 const deleteEnvelopeById = async (req, res, next) => {
     try{
-        await deleteEntry(req.id, 'envelopes');
+        req.envelope  = await deleteEntry(req.id, 'envelopes');
         next();
     }catch(err){
         next(err);
@@ -69,7 +69,8 @@ const deleteEnvelopeById = async (req, res, next) => {
 //Transfers the specified budget from the specified envelope to the second specified envelope
 //**********needs refactoring to asyn for findEntry */
 //*********move transfer logic to helper functions? */
-const transferEnvelopeBudget = (req, res, next) => {
+//*********needs to build an error if both envelopes dont exist somehow */
+const transferEnvelopeBudget = async (req, res, next) => {
     try{
         //Saves the original envelopes
         let fromEnvelopeOriginal = findEntry(req.fromId);

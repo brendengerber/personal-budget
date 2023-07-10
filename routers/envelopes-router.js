@@ -1,3 +1,5 @@
+//******************NEEDS STATUS CODES
+
 //Imports necessary modules
 const express = require('express');
 const {validateEnvelopeReq, validateIdParam, validateReqTransferBudget} = require('../custom-middleware/validation-middleware.js');
@@ -43,6 +45,11 @@ envelopesRouter.delete('/:id', deleteEnvelopeById, (req, res, next) => {
 //Body must be the transfer amount in the form of a JSON object: {"transferBudget": 2000}
 envelopesRouter.put('/:from/transfer/:to', validateReqTransferBudget, transferEnvelopeBudget,(req, res, next) => {
     res.send({message: `The budget of ${req.transferBudget} has been transferred from ID ${req.fromId} to ID ${req.toId}.`});
+});
+
+envelopesRouter.put('/test',(req, res, next) => {
+    updateEnvelopeBudget()
+    res.send({message: `success`});
 });
 
 //Exports the router

@@ -1,14 +1,16 @@
 //Imports config 
 const {config} = require('./config.js');
 
-//Sets up database connection configuration
-const Pool = require('pg').Pool
-const pool = new Pool({
-  user: config.databaseUser,
-  host: config.databaseHost,
-  database: config.database,
-  password: config.databasePassword,
-  port: config.databasePort,
-});
+//Imports required modules
+const pgp = require('pg-promise')();
 
-module.exports = {pool};
+//Sets up database connection
+const db = pgp({
+    user: config.databaseUser,
+    host: config.databaseHost,
+    database: config.database,
+    password: config.databasePassword,
+    port: config.databasePort,
+  })
+
+module.exports = {db};
