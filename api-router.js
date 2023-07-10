@@ -13,7 +13,7 @@ apiRouter.use((err, req, res, next) => {
     if(!err.status){
       err.status = 500;
     }
-    res.status(err.status).send({message: err.message});
+    res.status(err.status).send(err.message);
   });
 
 //Exports the router
