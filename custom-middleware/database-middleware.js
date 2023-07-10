@@ -1,7 +1,5 @@
 //All the actual deleting, updating, etc are performed the database-helper-functions so they can be reused
 //For example the budget transfer middleware uses an update function, which is also used in the middleware that updates a single envelope
-//**********Update comments to match  */
-
 
 //Imports database helper functions
 const {getAllEntries, getEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
@@ -31,7 +29,7 @@ const getEnvelopeById =  async (req, res, next) => {
 const addEnvelope = async (req, res, next) => {
     try{
         //Sets req.envelope to the newly created database entry including its assigned v4 UUID
-        req.envelope = await addEntry(req.envelope, 'envelopes');
+        req.envelope = await addEntry(req.id, req.envelope, 'envelopes');
         next();
     }catch (err){
         next(err);
@@ -52,10 +50,10 @@ const updateEnvelopeById = async (req, res, next) => {
     }
 };
 
-//Deletes the envelope of the specified id
+//Deletes the envelope of the specified id and 
 const deleteEnvelopeById = async (req, res, next) => {
     try{
-        req.envelope  = await deleteEntry(req.id, 'envelopes');
+        req.envelopeDeleted  = await deleteEntry(req.id, 'envelopes');
         next();
     }catch(err){
         next(err);

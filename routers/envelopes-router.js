@@ -1,5 +1,3 @@
-//******************NEEDS STATUS CODES
-
 //Imports necessary modules
 const express = require('express');
 const {validateEnvelopeReq, validateIdParam, validateReqTransferBudget} = require('../custom-middleware/validation-middleware.js');
@@ -14,7 +12,6 @@ envelopesRouter.param('from', validateIdParam('fromId'));
 envelopesRouter.param('to', validateIdParam('toId'));
 
 //Gets all envelopes
-//*******************needs refactor to use database */
 envelopesRouter.get('/', getAllEnvelopes, (req, res, next) => {
     res.status(200).send(req.envelopes);
 });
@@ -30,9 +27,9 @@ envelopesRouter.post('/', validateEnvelopeReq, addEnvelope, (req, res, next) => 
     res.status(201).send(req.envelope);
 });
 
-//Deletes the envelope with the specified id
+//Deletes the envelope with the specified id and sends it
 envelopesRouter.delete('/:id', deleteEnvelopeById, (req, res, next) => {
-    res.status(200).send(req.envelope);
+    res.status(200).send(req.envelopeDeleted);
 });
 
 //Updates the envelope with the specified id

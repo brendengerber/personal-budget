@@ -39,8 +39,7 @@ const getEntry = async (entryId, tableName) => {
 //Adds an entry to the specified table and returns the newly assigned v4 UUID
 //Uses the properties of the entry object to create a custom paramaterized query statement
 //Entry properties must match the columns of the INSERT query
-//*******add id arg to match even though it is in entry? */
-const addEntry = async (entry, tableName) => {
+const addEntry = async (entryId, entry, tableName) => {
     let columnsArray = Object.getOwnPropertyNames(entry);
     columnsArray = columnsArray.slice(1);
     let valuesArray = Object.values(entry);
@@ -79,6 +78,7 @@ const updateEntry = async (entryId, entry, tableName) => {
     }
 };
 
+//Deletes an entry of specified ID and returns the deleted entry
 const deleteEntry = async (entryId, tableName) => {
     //Queries the database to delete the entry of the specified id
     let result = await db.query("DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *", {
@@ -87,7 +87,7 @@ const deleteEntry = async (entryId, tableName) => {
     });
 
     if(result.length === 1){
-        return;
+        return result[0];
     
     //Throws a 404 Error if the entry does not exist
     }else{
@@ -97,7 +97,6 @@ const deleteEntry = async (entryId, tableName) => {
     }
 };
 
-//****validate budget needs rework */
 const incrementEntryColumn = async (entryId, columnName, tableName, amountToIncrement) => {
     let result = await db.query('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
         table: tableName,
