@@ -11,7 +11,8 @@ const {db} = require('../queries.js')
 const findEntry = async (entryId, tableName) => {
     
     //Queries the database to find the entry of the specified id and returns the result
-    let result = await db.query('SELECT * FROM $1:name WHERE id = $2', [tableName, entryId])
+    let result = await db.query('SELECT * FROM $1:name WHERE id = $2', [tableName, entryId]);
+
     if(result[0]){
         return result[0];
 
@@ -72,6 +73,7 @@ const deleteEntry = async (entryId, tableName) => {
         table: tableName,
         id: entryId
     });
+
     if(result.length === 1){
         return;
     
@@ -83,63 +85,49 @@ const deleteEntry = async (entryId, tableName) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const updateEntryColumn = async (id, column, value, table) => {
-
-    let result = await pool.query(`UPDATE ${table} SET ${column} = $2 WHERE id = $1`, [id, value])
-    if(result.rows[0]){
-        return result.rows[0];
-
-    //Throws a 404 Error if the entry does not exist
-    }else{
-        const err = new Error(`Error: ${table.slice(0, -1)} with ID ${entry.id} does not exist.`);
-        err.status = 404;
-        throw err;
-    }
-
-};
-
-const updateEnvelopeBudget = async (id, budget, table) => {
-
-    let result = await pool.query(`UPDATE ${table} SET ${column} = ${column} + ${budget} WHERE id = $1`, [id])
-        if(result.rows[0]){
-            return result.rows[0];
+//****validate budget needs rework */
+const incrementEntryColumn = async (entryId, columnName, tableName, amountToIncrement) => {
+    let result = await db.query('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
+        table: tableName,
+        column: columnName,
+        amount: amountToIncrement,
+        id: entryId
+    });
+        if(result.length === 1){
+            return result[0];
 
         //Throws a 404 Error if the entry does not exist
         }else{
-            const err = new Error(`Error: ${table.slice(0, -1)} with ID ${entry.id} does not exist.`);
+            const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${entryId} does not exist.`);
             err.status = 404;
             throw err;
         }
 };  
     
+const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableName, amountToTransfer) => {
+        //Checks that the original entries exist and saves them
+        let fromEntryOriginal = await findEntry(fromEntryId, tableName);
+        let toEntryOriginal = await findEntry(toEntryId, tableName);
 
-
-
-
-
+        try{
+            //Updates the entries and returns if successful
+            await incrementEntryColumn(fromEntryId, columnName, tableName, -amountToTransfer);
+            await incrementEntryColumn(toEntryId, columnName, tableName, amountToTransfer);
+            return;
+    
+        }catch(err){
+            //Resets the entries in case there was an error and throws it
+            await updateEntry(fromEntryId, fromEntryOriginal, tableName);
+            await updateEntry(toEntryId, toEntryOriginal, tableName);
+            throw err;
+        }
+};
 
 module.exports = {
     findEntry,
     addEntry,
     updateEntry,
     deleteEntry,
-    updateEntryColumn
+    incrementEntryColumn,
+    transferColumnAmount
 };

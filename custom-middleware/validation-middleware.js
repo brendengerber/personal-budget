@@ -31,18 +31,20 @@ const validateIdParam = (customProperty) => {
 
 //Validates the balance format in req body and attatches it to req.transferBalance
 const validateReqTransferBudget = (req, res, next) => {
-    try{
-        //************* validateMoney now returns an error instead of false, refactor here accordingly
-        if(validateMoney(req.body.transferBudget)){
-//************Does this need to be changed to number? like before? try transferring the same budget twice to see */
-            req.transferBudget = req.body.transferBudget;
-            next();
-        }else{
-            res.status(400).send({message: `Error: ${req.body.transferBudget} is an invalid budget.`});
-        }
-    }catch(err){
-        next(err);
-    }
+    req.transferBudget = req.body.budget
+    next();
+//     try{
+//         //************* validateMoney now returns an error instead of false, refactor here accordingly
+//         if(validateMoney(req.body.transferBudget)){
+// //************Does this need to be changed to number? like before? try transferring the same budget twice to see */
+//             req.transferBudget = req.body.transferBudget;
+//             next();
+//         }else{
+//             res.status(400).send({message: `Error: ${req.body.transferBudget} is an invalid budget.`});
+//         }
+    // }catch(err){
+    //     next(err);
+    // }
 };
 
 module.exports = {

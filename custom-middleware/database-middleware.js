@@ -5,7 +5,7 @@
 
 
 //Imports database helper functions
-const {findEntry, addEntry, updateEntry, deleteEntry, updateEntryColumn} = require('../helper-functions/database-helper-functions.js');
+const {findEntry, addEntry, updateEntry, deleteEntry, incrementEntryColumn, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
 
 //Adds an envelope
 const addEnvelope = async (req, res, next) => {
@@ -63,7 +63,7 @@ const deleteEnvelopeById = async (req, res, next) => {
 
 
 
-
+// incrementEntryColumn = async (entryId, columnName, tableName, amountToIncrement)
 
 
 //Transfers the specified budget from the specified envelope to the second specified envelope
@@ -71,36 +71,10 @@ const deleteEnvelopeById = async (req, res, next) => {
 //*********move transfer logic to helper functions? */
 //*********needs to build an error if both envelopes dont exist somehow */
 const transferEnvelopeBudget = async (req, res, next) => {
+    //Saves the original envelopes
     try{
-        //Saves the original envelopes
-        let fromEnvelopeOriginal = findEntry(req.fromId);
-        let toEnvelopeOriginal = findEntry(req.toId);
-
-        //Updates the envelopes if they both exist
-        if(fromEnvelopeOriginal && toEnvelopeOriginal){
-            let fromEnvelopeUpdated = updateEntryBudget(req.fromId, -req.transferBudget);
-            let toEnvelopeUpdated = updateEntryBudget(req.toId, req.transferBudget);
-            //Calls next() if both updates are successful
-            if(fromEnvelopeUpdated && toEnvelopeUpdated){
-                return next();
-            // If some error occured and one envelope was not successfully updated, the envelopes are returned to their original states and an error message is sent
-            }else if(!fromEnvelopeUpdated || !toEnvelopeUpdated){
-                updateEntry(fromEnvelopeOriginal, 'envelopes');
-                updateEntry(toEnvelopeOriginal, 'envelopes');
-                return res.status(500).send({message: 'An unknown error has occured and envelopes have been reset to their original values'});
-            }
-        }
-        
-        //If one or both of the envelopes do not exist, an error message is created and sent
-        let errorMessage = ``;
-        if(!fromEnvelopeOriginal){
-            errorMessage += ` Envelope with ID ${req.fromId} does not exist.`;
-        }
-        if(!toEnvelopeOriginal){
-            errorMessage += ` Envelope with ID ${req.toId} does not exist.`;
-        }
-        res.status(404).send({message: errorMessage.trim()});
-        
+        await transferColumnAmount(req.fromId, req.toId, "budget", "envelopes", req.transferBudget);
+        next();
     }catch(err){
         next(err);
     }
