@@ -3,7 +3,7 @@
 //Imports necessary modules
 const express = require('express');
 const {validateEnvelopeReq, validateIdParam, validateReqTransferBudget} = require('../custom-middleware/validation-middleware.js');
-const {findEnvelopeById, addEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
+const {ruturnAllEnvelopes, findEnvelopeById, addEnvelope, deleteEnvelopeById, updateEnvelopeById, transferEnvelopeBudget} = require('../custom-middleware/database-middleware.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
@@ -15,8 +15,8 @@ envelopesRouter.param('to', validateIdParam('toId'));
 
 //Gets all envelopes
 //*******************needs refactor to use database */
-envelopesRouter.get('/', (req, res, next) => {
-    res.send(envelopes);
+envelopesRouter.get('/', ruturnAllEnvelopes, (req, res, next) => {
+    res.send(req.envelopes);
 });
 
 //Gets an envelope with the specified id

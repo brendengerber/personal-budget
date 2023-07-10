@@ -5,7 +5,17 @@
 
 
 //Imports database helper functions
-const {findEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
+const {returnAllEntries, findEntry, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
+
+//
+const ruturnAllEnvelopes = async (req, res, next) => {
+    try{
+        req.envelopes = await returnAllEntries('envelopes');
+        next();
+    }catch(err){
+        next(err);
+    }
+};
 
 //Adds an envelope
 const addEnvelope = async (req, res, next) => {
@@ -83,6 +93,7 @@ const transferEnvelopeBudget = async (req, res, next) => {
 };
 
 module.exports = {
+    ruturnAllEnvelopes,
     addEnvelope,
     findEnvelopeById,
     deleteEnvelopeById,

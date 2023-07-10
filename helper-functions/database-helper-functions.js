@@ -7,6 +7,18 @@
 //Imports necessary modules
 const {db} = require('../queries.js')
 
+//Returns an array of all entries of a table
+const returnAllEntries = async (tableName) => {
+    let result = await db.query('SELECT * FROM $1:name', [tableName]);
+    if(result.length > 0){
+        return result;
+    }else{
+        const err = new Error(`Error: there are no entries in ${tableName}.`);
+        err.status = 404;
+        throw err;
+    }
+};
+
 //Finds and returns the entry with the requested id
 const findEntry = async (entryId, tableName) => {
     
@@ -124,6 +136,7 @@ const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableNam
 };
 
 module.exports = {
+    returnAllEntries,
     findEntry,
     addEntry,
     updateEntry,
