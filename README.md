@@ -44,7 +44,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Description: Adds a new envelope to the database and assigns it a unique v4 UUID
 * Path: `/api/envelopes/`
 * Method: `POST`
-* Payload: JSON object `{"category": string, "budget": number}`
+* Payload: JSON object `{"category": string, "budget": xxxx.xx number}`
 * Response: JSON object containing the envelope and it's newly assigned v4 UUID
 
 ### Endpoint: Delete Envelope By Id
@@ -57,14 +57,14 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Description: Updates an envelope in the database with a specified new envelope
 * Path: `/api/envelopes/{id}`
 * Method: `PUT`
-* Payload: JSON object `{"category": string, "budget": number}` OR `{"id": string, "category": string, "budget": number}`
+* Payload: JSON object `{"category": string, "budget": xxxx.xx number}` OR `{"id": string, "category": string, "budget": xxxx.xx number}`
 * Response: JSON object containing the updated envelope
 
 ### Endpoint: Transfer Envelope Budget
 * Description: Updates two specified envelopes in the database by transfering a specified budget from one to another
 * Path: `/api/envelopes/{from-id}/transfer/{to-id}`
 * Method: `PUT`
-* Payload: JSON object `{"budget": number}`
+* Payload: JSON object `{"budget": xxxx.xx number}`
 * Response: JSON object containing an array of the updated envelopes
 
 ## **Acknowledgement**
