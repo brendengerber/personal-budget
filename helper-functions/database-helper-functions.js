@@ -1,6 +1,7 @@
 //This file contains database helper functions that manipulate the database in some way
-//These functions are generic and can be used dynamically on any table by multiple modules for multiple purposes
-//These functions are paramaterized and dynamic table/column names are escaped to avoid SQL injection 
+//They are kept separate not only to reuse, but also to separate functionality
+//They are generic and can be used dynamically on any table by multiple modules for multiple purposes
+//They are paramaterized and dynamic table/column names are escaped to avoid SQL injection 
 //If the data storage method is changed, these functions can be refactored to return the same results without affecting the rest of the server and allowing it to continue functioning as normal
 
 //Imports necessary modules

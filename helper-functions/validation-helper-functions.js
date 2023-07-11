@@ -1,3 +1,6 @@
+//This file contains database helper functions that validate user submitted data
+//They are kept separate not only to reuse, but also to separate functionality
+
 //Imports necessary modules
 const validator = require('validator');
 const Schema = require('validate');
