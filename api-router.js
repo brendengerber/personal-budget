@@ -8,6 +8,10 @@ const apiRouter = express.Router();
 const envelopesRouter = require('./routers/envelopes-router.js');
 apiRouter.use('/envelopes', envelopesRouter);
 
+//Mounts the transactionsRouter
+const transactionsRouter = require('./routers/envelopes-router.js');
+apiRouter.use('/transactions', transactionsRouter);
+
 //Handles all errors
 apiRouter.use((err, req, res, next) => {
     if(!err.status){
