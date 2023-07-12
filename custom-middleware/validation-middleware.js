@@ -4,7 +4,7 @@
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted
 
 //Imports necessary modules
-const {validateId, validateEnvelope, validateBudget} = require('../helper-functions/validation-helper-functions.js');
+const {validateId, validateEnvelope, validateBudget, validateTransaction} = require('../helper-functions/validation-helper-functions.js');
 
 //Validates the format of an envelope submitted in the req.body and attatches it to req.envelope
 //A valid envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxxx.xx number}

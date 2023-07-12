@@ -1,0 +1,4 @@
+check validation working for transactions
+add undefined id to posts
+do transactions get mismatch if an id is included in the param but a different one in the body?
+what if there is an id included with the post?

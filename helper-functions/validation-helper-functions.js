@@ -56,7 +56,7 @@ const validateEnvelope = function(envelope, id){
     let validationErrors;
     //Validates the format of the envelope and sets validationErrors equal to an array of errors if any
     validationErrors = envelopeSchema.validate(envelope);
-    //Checks that the body id property is a valid v4 UUID if it exists and adds an error to the array if not
+    //Checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
     try{
         if(envelope.id){
             validateId(envelope.id);
@@ -126,10 +126,73 @@ const validateBudget = function (budget){
     }
 };
 
+//Creates a schema to validate transaction objects
+const transactionSchema = new Schema({
+    id: {
+        type: String,
+        required: false    
+    },
+    envelope_id: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true
+    }
+}, {strict: true});
+
+//Validates a transaction object
+//A successfully validated transaction will conform to {id: v4 UUID string/undefined, envelope_id: v4 UUID string, description: string, amount: xxxx.xx number}
+const validateTransaction = function (transaction){
+    let validationErrors;
+    //Validates the format of the transaction and sets validationErrors equal to an array of errors if any
+    validationErrors = transactionSchema.validate(transaction);
+    
+    //Checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
+    try{
+        if(transaction.id){
+            validateId(transaction.id);
+        }
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Checks that the envelope_id is a valid v4 UUID and adds an error to the array if not
+    try{
+        validateId(transaction.envelope_id);
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Checks that the amount follows the xxxx.xx format and adds an error to the array if not
+    try{
+        validateMoney(transaction.amount);
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Checks if any errors have been recorded and if not, returns the budget
+    if(validationErrors.length === 0){
+        return transaction;
+    //In case of errors, creates and throws a new error object describing all invalid formatting
+    }else{
+        const err = new Error(`The budget format is invalid.\n ${validationErrors.join("\n")}`);
+        err.status = 400;
+        throw err;
+    }
+};
+
+
+
+
+
 //Exports functions to be used in other modules
 module.exports = {
     validateMoney,
     validateId,
     validateEnvelope,
-    validateBudget
+    validateBudget,
+    validateTransaction
 };
