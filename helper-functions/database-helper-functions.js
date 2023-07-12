@@ -22,7 +22,7 @@ const getAllEntries = async (tableName) => {
 };
 
 //Finds and returns the entry with the specified id from the specified table
-const getEntry = async (entryId, tableName) => {
+const getEntryById = async (entryId, tableName) => {
     //Queries the database to find the entry of the specified id and returns the result
     let result = await db.query('SELECT * FROM $1:name WHERE id = $2', [tableName, entryId]);
     if(result[0]){
@@ -34,6 +34,42 @@ const getEntry = async (entryId, tableName) => {
         throw err;
     }
 };
+
+
+
+
+
+
+
+
+
+//Finds and returns the entries from a specified table that match a specified value in a specified column
+const getMatchingEntries = async (tableName, column, value) => {
+    let result = await db.query('SELECT * FROM $1:name WHERE $2:name = $3', [tableName, column, value]);
+    if(result.length > 0){
+        return result;
+    //Throws an error if no entries exist
+    }else{
+        const err = newError(`Error: There are no ${tableName} that are associated with ${column} ${value}`);
+        err.status = 404;
+        throw err;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Adds an entry to the specified table and returns the entry along with the newly assigned v4 UUID
 //Uses the properties of the entry object to create a custom query statement
@@ -135,7 +171,8 @@ const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableNam
 //Exports functions to be used in other modules
 module.exports = {
     getAllEntries,
-    getEntry,
+    getEntryById,
+    getMatchingEntries,
     addEntry,
     updateEntry,
     deleteEntry,
