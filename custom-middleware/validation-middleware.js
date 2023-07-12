@@ -43,9 +43,20 @@ const validateReqTransferBudget = (req, res, next) => {
     }
 };
 
+const validateTransactionReq = (req, res, next) => {
+    try{
+        req.transaction = validateTransaction(req.body, req.transactionId);
+        next();
+    }catch(err){
+        next(err);
+    }
+
+};
+
 module.exports = {
     validateEnvelopeReq,
     validateIdParam,
-    validateReqTransferBudget
+    validateReqTransferBudget,
+    validateTransactionReq
 };
 

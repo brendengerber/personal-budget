@@ -64,13 +64,13 @@ const validateEnvelope = function(envelope, id){
     }catch(err){
         validationErrors.push(err.message);
     }
-    //Checks that the envelope id matches the provided id and adds an error to the array if not
+    //Checks that the envelope id matches the provided id (i.e. the one supplied by a parameter etc) and adds an error to the array if not
     if(envelope.id && id){
         if(envelope.id !== id){
             validationErrors.push('Error: there is an id mismatch.');
         }
     }
-    //Adds an error to the array in cases where no id is provided (i.e. one hasn't been assigned yet etc.), but the envelope contains an id
+    //Adds an error to the array in cases where no id is provided (i.e. one hasn't been assigned yet etc), but the envelope contains an id
     if(envelope.id && !id){
         validationErrors.push('Error: there is an id mismatch.');
     }
@@ -148,11 +148,10 @@ const transactionSchema = new Schema({
 
 //Validates a transaction object
 //A successfully validated transaction will conform to {id: v4 UUID string/undefined, envelope_id: v4 UUID string, description: string, amount: xxxx.xx number}
-const validateTransaction = function (transaction){
+const validateTransaction = function (transaction, id){
     let validationErrors;
     //Validates the format of the transaction and sets validationErrors equal to an array of errors if any
     validationErrors = transactionSchema.validate(transaction);
-    
     //Checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
     try{
         if(transaction.id){
@@ -160,6 +159,20 @@ const validateTransaction = function (transaction){
         }
     }catch(err){
         validationErrors.push(err.message);
+    }
+    //Checks that the transaction id matches the provided id (i.e. the one supplied by a parameter etc) and adds an error to the array if not
+    if(transaction.id && id){
+        if(transaction.id !== id){
+            validationErrors.push('Error: there is an id mismatch.');
+        }
+    }
+    //Adds an error to the array in cases where no id is provided (i.e. one hasn't been assigned yet etc.), but the transaction contains an id
+    if(transaction.id && !id){
+        validationErrors.push('Error: there is an id mismatch.');
+    }
+    //Standardizes the transaction by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't exist
+    if(!transaction.id){
+        transaction = {'id': id, ...transaction};
     }
     //Checks that the envelope_id is a valid v4 UUID and adds an error to the array if not
     try{
@@ -178,13 +191,11 @@ const validateTransaction = function (transaction){
         return transaction;
     //In case of errors, creates and throws a new error object describing all invalid formatting
     }else{
-        const err = new Error(`The budget format is invalid.\n ${validationErrors.join("\n")}`);
+        const err = new Error(`The transaction format is invalid.\n ${validationErrors.join("\n")}`);
         err.status = 400;
         throw err;
     }
 };
-
-
 
 
 

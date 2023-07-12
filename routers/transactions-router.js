@@ -3,7 +3,7 @@
 
 //Imports necessary modules
 const express = require('express');
-const {validateIdParam} = require('../custom-middleware/validation-middleware.js');
+const {validateIdParam, validateTransactionReq} = require('../custom-middleware/validation-middleware.js');
 const {getAllTransactions, getTransactionById, addTransaction, updateTransactionById, deleteTransactionById} = require('../custom-middleware/transactions-database-middleware.js');
 
 //Creates the router
@@ -24,7 +24,7 @@ transactionsRouter.get('/:id', getTransactionById, (req, res, next) => {
 
 //Posts a new transaction and sends the posted transaction along with the newly generated v4 UUID
 //Body must be the new transaction in the form of a JSON object: {"envelope_id": v4 UUID string, amount: xxxx.xx number}
-transactionsRouter.post('/', addTransaction, (req, res, next) => {
+transactionsRouter.post('/', validateTransactionReq, addTransaction, (req, res, next) => {
     res.status(201).send(req.transaction);
 });
 
@@ -35,7 +35,7 @@ transactionsRouter.delete('/:id', deleteTransactionById, (req, res, next) => {
 
 //Updates the transaction with the specified id and sends the newly updated transaction
 //Body must be the new transaction in the form of a JSON object: {"id": v4 UUID string, "category": string, "budget": xxxx.xx number} or {"category": string, "budget": xxxx.xx number}
-transactionsRouter.put('/:id', updateTransactionById, (req, res, next) => {
+transactionsRouter.put('/:id', validateTransactionReq, updateTransactionById, (req, res, next) => {
     res.status(200).send(req.transaction);
 });
 

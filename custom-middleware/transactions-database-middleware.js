@@ -24,7 +24,7 @@ const getTransactionById =  async (req, res, next) => {
 //Adds a transaction, assigns it a v4 UUID, and attatches the updated transaction to req.transaction
 const addTransaction = async (req, res, next) => {
     try{
-        req.transaction = await addEntry(req.transactionId, 'transactions');
+        req.transaction = await addEntry(req.transaction, 'transactions');
         next();
     }catch (err){
         next(err);
