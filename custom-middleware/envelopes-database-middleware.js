@@ -1,8 +1,8 @@
 //Route functionality is kept here in seperate middleware functions to maintain separation of concerns and allow for re-use in multiple routes
-//Middleware functions are in charge of calling the correct helper functions with the correct arguments and attatching results to the req object
+//Middleware functions are in charge of calling the correct services with the correct arguments and attatching results to the req object
 
-//Imports database helper functions
-const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../helper-functions/database-helper-functions.js');
+//Imports database services
+const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, transferColumnAmount} = require('../services/database-services.js');
 
 //Gets all envelopes and adds them to req.envelopes
 const getAllEnvelopes = async (req, res, next) => {

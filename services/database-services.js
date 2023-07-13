@@ -1,4 +1,4 @@
-//This file contains database helper functions that manipulate the database in some way
+//This file contains database services that manipulate the database in some way
 //They are kept separate not only to reuse, but also to separate functionality
 //They are generic and can be used dynamically on any table by multiple modules for multiple purposes
 //They are paramaterized and dynamic table/column names are escaped to avoid SQL injection 

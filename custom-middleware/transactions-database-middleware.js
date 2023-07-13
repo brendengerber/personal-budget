@@ -1,5 +1,5 @@
-//Imports database helper functions
-const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry} = require('../helper-functions/database-helper-functions.js');
+//Imports database services
+const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry} = require('../services/database-services.js');
 
 //Gets all transactions and adds them to req.transaction
 const getAllTransactions = async (req, res, next) => {

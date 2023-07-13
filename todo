@@ -2,3 +2,66 @@ check validation working for transactions
 add undefined id to posts
 do transactions get mismatch if an id is included in the param but a different one in the body?
 what if there is an id included with the post?
+
+
+add date to transaction and validation
+
+
+adding transactions should remove budget from the envelope
+add a monthly budget and a remaining budget to envelope
+then subtract from the remaining budget
+transfer budget should also take from remaining budget
+then make the server reset the budget values at the end of the month
+or have four tables current envelopes, some kind of reset envelopes, current transactions, archived transactions? thats a lot of worky tho
+
+addTransaction processTransaction
+
+env file?
+
+
+update should not update if property is null
+
+
+
+
+
+
+
+
+
+
+
+
+
+testing
+
+POST
+check with id (should fail)
+check without id
+
+PUT
+check with matching valid id 
+check with matching invalid id (should fail)
+check with mismatching id (should fail)
+check with no id (should fail)
+check with invalid id param (should fail)
+check null values don't update
+
+GET all
+
+GET all transactions
+check with existing valid id 
+check with unexisting valid id (should fail)
+check with invalid id (should fail)
+
+GET by id
+check with existing valid id 
+check with unexisting valid id (should fail)
+check with invalid id (should fail)
+
+Delete
+check with existing valid id 
+check with unexisting valid id (should fail)
+check with invalid id (should fail)
+
+test receipts and envelopes one at a time making one property invalid and then omitting that property to make sure the errors catch

@@ -1,4 +1,4 @@
-//This file contains validation helper functions that validate user submitted data
+//This file contains validation services that validate user submitted data
 //They are kept separate not only to reuse, but also to separate functionality
 
 //Imports necessary modules

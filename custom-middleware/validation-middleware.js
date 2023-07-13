@@ -1,10 +1,10 @@
 //Route functionality is kept here in seperate middleware functions to maintain separation of concerns and allow for re-use in multiple routes
-//Middleware functions are in charge of calling the correct helper functions with the correct arguments and attatching results to the req object
+//Middleware functions are in charge of calling the correct services with the correct arguments and attatching results to the req object
 //Validation functions will add validated req bodies and parameters as custom properties to the req object
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted
 
 //Imports necessary modules
-const {validateId, validateEnvelope, validateBudget, validateTransaction} = require('../helper-functions/validation-helper-functions.js');
+const {validateId, validateEnvelope, validateBudget, validateTransaction} = require('../services/validation-services.js');
 
 //Validates the format of an envelope submitted in the req.body and attatches it to req.envelope
 //A valid envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxxx.xx number}
