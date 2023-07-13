@@ -6,6 +6,7 @@
 
 //Imports necessary modules
 const {db} = require('../queries.js');
+const {handleTransactionErr} = require('../utilities/database-utilities.js')
 
 //Returns an array of all entries from a specified table
 const getAllEntries = async (tableName) => {
@@ -128,7 +129,7 @@ const deleteEntry = async (entryId, tableName) => {
 }; 
 
 //Transfers an amount from the column of one entry to the a column on a different entry
- const transferColumnAmount = (fromTable, fromColumn, fromId, toTable, toColumn, toId, amount) => {
+ const transferAmountBetweenColumns = (fromTable, fromColumn, fromId, toTable, toColumn, toId, amount) => {
     return db.tx(t =>{
         return t.batch([
             t.one('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
@@ -144,31 +145,11 @@ const deleteEntry = async (entryId, tableName) => {
                 id: toId
             })
         ]);
-    }).catch((err) => {
-        //Finds the index of the first query that failed
-        const errIdx = err.data.findIndex(e => !e.success);
-        //Handles any err resluting from a failed query
-        if(errIdx || errIdx === 0){
-            //Sets which Id and table caused the error based on the errIdx
-            let errId;
-            let errTable;
-            if(errIdx === 0){
-                errId = fromId;
-                errTable = fromTable;
-            }else if(errIdx === 1){
-                errId = toId;
-                errTable = fromTable;
-            }
-            //Sets the error message and status based on the failed Id
-            err.message = `Error: ${errTable.slice(0, -1)} with ID ${errId} does not exist.`
-            err.status = 404;
-            throw err;
-        //Handles the err in case of some other unforseen error
-        }else{
-            throw err;
-        }
-    })
+    }).catch(err => handleTransactionErr(err));
  };
+
+
+
 
 //Exports functions to be used in other modules
 module.exports = {
@@ -178,5 +159,5 @@ module.exports = {
     addEntry,
     updateEntry,
     deleteEntry,
-    transferColumnAmount
+    transferAmountBetweenColumns
 };

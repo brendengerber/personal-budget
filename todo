@@ -65,3 +65,37 @@ check with unexisting valid id (should fail)
 check with invalid id (should fail)
 
 test receipts and envelopes one at a time making one property invalid and then omitting that property to make sure the errors catch
+
+
+
+
+
+
+
+
+
+//crazy error handling
+catch((err) => {
+        //Finds the index of the first query that failed
+        const errIdx = err.data.findIndex(e => !e.success);
+        //Handles any err resluting from a failed query
+        if(errIdx || errIdx === 0){
+            //Sets which Id and table caused the error based on the errIdx
+            let errId;
+            let errTable;
+            if(errIdx === 0){
+                errId = fromId;
+                errTable = fromTable;
+            }else if(errIdx === 1){
+                errId = toId;
+                errTable = fromTable;
+            }
+            //Sets the error message and status based on the failed Id
+            err.message = `Error: ${errTable.slice(0, -1)} with ID ${errId} does not exist.`
+            err.status = 404;
+            throw err;
+        //Handles the err in case of some other unforseen error
+        }else{
+            throw err;
+        }
+    })
