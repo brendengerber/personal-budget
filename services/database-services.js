@@ -67,10 +67,6 @@ const getMatchingEntries = async (tableName, column, value) => {
 
 
 
-
-
-
-
 //Adds an entry to the specified table and returns the entry along with the newly assigned v4 UUID
 //Uses the properties of the entry object to create a custom query statement
 //Entry must begin with an undefined id property which will be assigned by the query
@@ -129,44 +125,50 @@ const deleteEntry = async (entryId, tableName) => {
         err.status = 404;
         throw err;
     }
-};
+}; 
 
-//Increments the specified numeric column of the entry with the specified id in the specified table by the specified amount
-const incrementEntryColumn = async (entryId, columnName, tableName, amountToIncrement) => {
-    //Queries the database to add the specified amount and returns the new updated entry    
-    let result = await db.query('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
-        table: tableName,
-        column: columnName,
-        amount: amountToIncrement,
-        id: entryId
-    });
-    if(result.length === 1){
-        return result[0];
-    //Throws an error if the entry does not exist
-    }else{
-        const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${entryId} does not exist.`);
-        err.status = 404;
-        throw err;
-    }
-};  
-    
-//Transfers a specified numeric ammount from one specified column of a specified entry from a specified table to another
-const transferColumnAmount = async (fromEntryId, toEntryId, columnName, tableName, amountToTransfer) => {
-        //Checks that the original entries exist and saves them
-        let fromEntryOriginal = await getEntry(fromEntryId, tableName);
-        let toEntryOriginal = await getEntry(toEntryId, tableName);
-        //Updates the entries and returns the updated entries if successful
-        try{
-            let fromEntryUpdated = await incrementEntryColumn(fromEntryId, columnName, tableName, -amountToTransfer);
-            let toEntryUpdated = await incrementEntryColumn(toEntryId, columnName, tableName, amountToTransfer);
-            return [fromEntryUpdated, toEntryUpdated];
-        //Resets the entries in case there was an error and throws it
-        }catch(err){
-            await updateEntry(fromEntryId, fromEntryOriginal, tableName);
-            await updateEntry(toEntryId, toEntryOriginal, tableName);
+//Transfers an amount from the column of one entry to the a column on a different entry
+ const transferColumnAmount = (fromTable, fromColumn, fromId, toTable, toColumn, toId, amount) => {
+    return db.tx(t =>{
+        return t.batch([
+            t.one('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
+                table: fromTable,
+                column: fromColumn,
+                amount: -amount,
+                id: fromId
+            }),
+            t.one('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
+                table: toTable,
+                column: toColumn,
+                amount: amount,
+                id: toId
+            })
+        ]);
+    }).catch((err) => {
+        //Finds the index of the first query that failed
+        const errIdx = err.data.findIndex(e => !e.success);
+        //Handles any err resluting from a failed query
+        if(errIdx || errIdx === 0){
+            //Sets which Id and table caused the error based on the errIdx
+            let errId;
+            let errTable;
+            if(errIdx === 0){
+                errId = fromId;
+                errTable = fromTable;
+            }else if(errIdx === 1){
+                errId = toId;
+                errTable = fromTable;
+            }
+            //Sets the error message and status based on the failed Id
+            err.message = `Error: ${errTable.slice(0, -1)} with ID ${errId} does not exist.`
+            err.status = 404;
+            throw err;
+        //Handles the err in case of some other unforseen error
+        }else{
             throw err;
         }
-};
+    })
+ };
 
 //Exports functions to be used in other modules
 module.exports = {
@@ -176,6 +178,5 @@ module.exports = {
     addEntry,
     updateEntry,
     deleteEntry,
-    incrementEntryColumn,
     transferColumnAmount
 };
