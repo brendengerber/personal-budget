@@ -197,8 +197,6 @@ const validatePurchase = function (purchase, id){
     }
 };
 
-
-
 //Exports functions to be used in other modules
 module.exports = {
     validateMoney,

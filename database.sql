@@ -6,7 +6,7 @@ CREATE TABLE "envelopes" (
   "budget" numeric(100, 2) NOT NULL
 );
 
-CREATE TABLE "transactions" (
+CREATE TABLE "purchases" (
   "id" uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   "envelope_id" uuid REFERENCES envelopes(id) NOT NULL,
   "date" date NOT NULL,
