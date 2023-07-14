@@ -17,9 +17,21 @@ const handleTransactionErr = (err) => {
     }
 };
 
+const handleQueryErr = (err) => {
+    if(!err.code){
+        err.message = 'Error: the requested entry does not exist.';
+        err.status = 404;
+        throw err;
+    }else{
+        err.message = `Error: Database server encountered an error with code ${err.code}.`;
+        throw err;
+    }
+};
+
 
 //Exports functions to be used in other modules
 module.exports = {
-    handleTransactionErr
+    handleTransactionErr,
+    handleQueryErr
 };
 
