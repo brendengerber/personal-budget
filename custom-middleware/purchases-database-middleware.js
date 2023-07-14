@@ -1,5 +1,5 @@
 //Imports database services
-const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry} = require('../services/database-services.js');
+const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addPurchaseAndSubtractBudgetFromEnvelope} = require('../services/database-services.js');
 
 //Gets all purchases and adds them to req.purchase
 const getAllPurchases = async (req, res, next) => {
@@ -21,10 +21,14 @@ const getPurchaseById =  async (req, res, next) => {
     }
 };
 
+//*********change to something like processPurchase */
+//*************currently req.purchase being set to updated to an array with the envelope envelope....need to save them and send them differently to req.purchase, req.envelope and then send both
 //Adds a purchase, assigns it a v4 UUID, and attatches the updated purchase to req.purchase
 const addPurchase = async (req, res, next) => {
     try{
-        req.purchase = await addEntry(req.purchase, 'purchases');
+        let update = await addPurchaseAndSubtractBudgetFromEnvelope(req.purchase);
+        req.purchase = update[0];
+        req.envelope = update[1];
         next();
     }catch (err){
         next(err);

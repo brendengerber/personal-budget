@@ -64,7 +64,7 @@ const addEntry = (entry, tableName) => {
     let valuesArray = Object.values(entry);
     valuesArray = valuesArray.slice(1);   
     //Queries the database to add the entry and returns the result
-    db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
+    return db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
         table: tableName,
         columns: columnsArray,
         values: valuesArray
@@ -129,9 +129,20 @@ const deleteEntry = (entryId, tableName) => {
         amount: subtractionAmount,
         id: toId
     }).catch(err => handleQueryErr(err));
+ };
+
+ //Returns an array consiting of the new purchase with it's newly assigned v4 UUID and the cooresponding envelope with it's updated budget
+ const addPurchaseAndSubtractBudgetFromEnvelope = (purchase) => {
+    return db.tx(t =>{
+        return t.batch([
+            addEntry(purchase, 'purchases'),
+            t.one('UPDATE envelopes SET budget = budget - ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
+                amount: purchase.amount,
+                id: purchase.envelope_id
+            })
+        ])
+    }).catch(err => handleTransactionErr(err));
  }
-
-
 
 //Exports functions to be used in other modules
 module.exports = {
@@ -141,5 +152,7 @@ module.exports = {
     addEntry,
     updateEntry,
     deleteEntry,
-    subtractColumnFromColumn
+    transferAmountBetweenColumns,
+    subtractColumnFromColumn,
+    addPurchaseAndSubtractBudgetFromEnvelope
 };
