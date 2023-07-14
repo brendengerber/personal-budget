@@ -28,7 +28,6 @@ const handleQueryErr = (err) => {
     }
 };
 
-
 //Exports functions to be used in other modules
 module.exports = {
     handleTransactionErr,

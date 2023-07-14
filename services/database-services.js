@@ -9,31 +9,20 @@ const {db} = require('../queries.js');
 const {handleTransactionErr, handleQueryErr} = require('../utilities/database-utilities.js')
 
 //Returns an array of all entries from a specified table
-const getAllEntries = async (tableName) => {
+const getAllEntries = (tableName) => {
     //Queries the database to return all entries from  the specified table
-    let result = await db.query('SELECT * FROM $1:name', [tableName]);
-    if(result.length > 0){
-        return result;
-    //Throws an error if the table is empty
-    }else{
-        const err = new Error(`Error: there are no entries in ${tableName}.`);
-        err.status = 404;
-        throw err;
-    }
+    return db.any('SELECT * FROM $1:name', [
+        tableName
+    ]).catch(err => handleQueryErr(err));
 };
 
 //Finds and returns the entry with the specified id from the specified table
-const getEntryById = async (entryId, tableName) => {
+const getEntryById = (entryId, tableName) => {
     //Queries the database to find the entry of the specified id and returns the result
-    let result = await db.query('SELECT * FROM $1:name WHERE id = $2', [tableName, entryId]);
-    if(result[0]){
-        return result[0];
-    //Throws an error if the entry does not exist
-    }else{
-        const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${entryId} does not exist.`);
-        err.status = 404;
-        throw err;
-    }
+    return db.one('SELECT * FROM $1:name WHERE id = $2', [
+        tableName, 
+        entryId
+    ]).catch(err => handleQueryErr(err));
 };
 
 
@@ -45,16 +34,12 @@ const getEntryById = async (entryId, tableName) => {
 
 
 //Finds and returns the entries from a specified table that match a specified value in a specified column
-const getMatchingEntries = async (tableName, column, value) => {
-    let result = await db.query('SELECT * FROM $1:name WHERE $2:name = $3', [tableName, column, value]);
-    if(result.length > 0){
-        return result;
-    //Throws an error if no entries exist
-    }else{
-        const err = newError(`Error: There are no ${tableName} that are associated with ${column} ${value}`);
-        err.status = 404;
-        throw err;
-    }
+const getMatchingEntries = (tableName, column, value) => {
+    return db.any('SELECT * FROM $1:name WHERE $2:name = $3', [
+        tableName, 
+        column, 
+        value
+    ]).catch(err => handleQueryErr(err));
 };
 
 
@@ -72,43 +57,34 @@ const getMatchingEntries = async (tableName, column, value) => {
 //Uses the properties of the entry object to create a custom query statement
 //Entry must begin with an undefined id property which will be assigned by the query
 //Entry properties must match the columns of the table
-const addEntry = async (entry, tableName) => {
+const addEntry = (entry, tableName) => {
     //Uses the entry object to create arrays containing the columns and values to add
     let columnsArray = Object.getOwnPropertyNames(entry);
     columnsArray = columnsArray.slice(1);
     let valuesArray = Object.values(entry);
     valuesArray = valuesArray.slice(1);   
     //Queries the database to add the entry and returns the result
-    let result = await db.query("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
+    db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
         table: tableName,
         columns: columnsArray,
         values: valuesArray
-    });
-    return result[0];
+    }).catch(err => handleQueryErr(err));
 };
 
 //Updates the entry with the specified id in the specified table
 //Entry must be an object that begins with an id property
 //Entry properties must match the columns of the table
-const updateEntry = async (entryId, entry, tableName) => {
+const updateEntry = (entryId, entry, tableName) => {
     //Uses the entry object to create arrays containing the columns and values to update
     let columnsArray = Object.getOwnPropertyNames(entry);
     let valuesArray = Object.values(entry);
     //Queries the database to update the entry and returns the result
-    let result = await db.query("UPDATE ${table:name} SET (${columns:name}) = (${values:csv}) WHERE id = ${id:csv} RETURNING *", {
+    return db.one("UPDATE ${table:name} SET (${columns:name}) = (${values:csv}) WHERE id = ${id:csv} RETURNING *", {
         table: tableName,
         columns: columnsArray,
         values: valuesArray,
         id: entryId
-    });
-    if(result[0]){
-        return result[0];
-    //Throws an error if the entry does not exist
-    }else{
-        const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${id} does not exist.`);
-        err.status = 404;
-        throw err;
-    }
+    }).catch(err => handleQueryErr(err));
 };
 
 //Deletes an entry of specified ID from the specified table and returns the deleted entry
@@ -117,7 +93,7 @@ const deleteEntry = (entryId, tableName) => {
     return db.one("DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *", {
         table: tableName,
         id: entryId
-    }).catch(err => {handleQueryErr(err)});
+    }).catch(err => handleQueryErr(err));
 }; 
 
 //Transfers an amount from the column of one entry to the a column on a different entry
