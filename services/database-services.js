@@ -6,7 +6,7 @@
 
 //Imports necessary modules
 const {db} = require('../queries.js');
-const {handleTransactionErr} = require('../utilities/database-utilities.js')
+const {handleTransactionErr, handleQueryErr} = require('../utilities/database-utilities.js')
 
 //Returns an array of all entries from a specified table
 const getAllEntries = async (tableName) => {
@@ -112,20 +112,12 @@ const updateEntry = async (entryId, entry, tableName) => {
 };
 
 //Deletes an entry of specified ID from the specified table and returns the deleted entry
-const deleteEntry = async (entryId, tableName) => {
+const deleteEntry = (entryId, tableName) => {
     //Queries the database to delete the entry of the specified id and returns the result
-    let result = await db.query("DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *", {
+    return db.one("DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *", {
         table: tableName,
         id: entryId
-    });
-    if(result.length === 1){
-        return result[0];
-    //Throws an error if the entry does not exist
-    }else{
-        const err = new Error(`Error: ${tableName.slice(0, -1)} with ID ${entryId} does not exist.`);
-        err.status = 404;
-        throw err;
-    }
+    }).catch(err => {handleQueryErr(err)});
 }; 
 
 //Transfers an amount from the column of one entry to the a column on a different entry
@@ -141,14 +133,23 @@ const deleteEntry = async (entryId, tableName) => {
             t.one('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
                 table: toTable,
                 column: toColumn,
-                amount: amount,
+                amount: amount, 
                 id: toId
             })
         ]);
     }).catch(err => handleTransactionErr(err));
  };
 
+//  const addColumnToColumn = (fromTable, fromColumn, fromId, toTable, toColumn, toId) => {
+//     return db.tx(t => {
+//         return t.batch([
+//             t.one(),
+//             t.one()
+//         ])
+//     }).catch(err => {
 
+//     })
+//  }
 
 
 //Exports functions to be used in other modules
