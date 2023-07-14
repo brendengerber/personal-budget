@@ -24,10 +24,10 @@ const getEnvelopeById =  async (req, res, next) => {
     }
 };
 
-//Gets the transactions of the envelope with the specified Id and attatches them to req.envelopeTransactions
-const getEnvelopeTransactionsById = async (req, res, next) => {
+//Gets the purchases of the envelope with the specified Id and attatches them to req.envelopePurchases
+const getEnvelopePurchasesById = async (req, res, next) => {
     try{
-        req.envelopeTransactions = await getMatchingEntries('transactions', 'envelope_id', req.envelopeId);
+        req.envelopePurchases = await getMatchingEntries('purchases', 'envelope_id', req.envelopeId);
         next();
     }catch(err){
         next(err);
@@ -78,7 +78,7 @@ const transferEnvelopeBudgetByIds =  async (req, res, next) => {
 module.exports = {
     getAllEnvelopes,
     getEnvelopeById,
-    getEnvelopeTransactionsById,
+    getEnvelopePurchasesById,
     addEnvelope,
     updateEnvelopeById,
     deleteEnvelopeById,

@@ -1,7 +1,7 @@
 //Imports necessary modules
 const express = require('express');
 const {validateEnvelopeReq, validateIdParam, validateReqTransferBudget} = require('../custom-middleware/validation-middleware.js');
-const {getAllEnvelopes, getEnvelopeById, getEnvelopeTransactionsById, addEnvelope, updateEnvelopeById, deleteEnvelopeById, transferEnvelopeBudgetByIds} = require('../custom-middleware/envelopes-database-middleware.js');
+const {getAllEnvelopes, getEnvelopeById, getEnvelopePurchasesById, addEnvelope, updateEnvelopeById, deleteEnvelopeById, transferEnvelopeBudgetByIds} = require('../custom-middleware/envelopes-database-middleware.js');
 
 //Creates the router
 const envelopesRouter = express.Router();
@@ -31,9 +31,9 @@ envelopesRouter.get('/:id', getEnvelopeById, (req, res, next) => {
 
 
 
-//Gets all transactions associated with the specified envelope
-envelopesRouter.get('/:id/transactions', getEnvelopeTransactionsById, (req, res, next) => {
-    res.status(200).send(req.envelopeTransactions);
+//Gets all purchases associated with the specified envelope
+envelopesRouter.get('/:id/purchases', getEnvelopePurchasesById, (req, res, next) => {
+    res.status(200).send(req.envelopePurchases);
 });
 
 

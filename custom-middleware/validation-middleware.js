@@ -4,7 +4,7 @@
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted
 
 //Imports necessary modules
-const {validateId, validateEnvelope, validateBudget, validateTransaction} = require('../services/validation-services.js');
+const {validateId, validateEnvelope, validateBudget, validatePurchase} = require('../services/validation-services.js');
 
 //Validates the format of an envelope submitted in the req.body and attatches it to req.envelope
 //A valid envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxxx.xx number}
@@ -43,9 +43,9 @@ const validateReqTransferBudget = (req, res, next) => {
     }
 };
 
-const validateTransactionReq = (req, res, next) => {
+const validatePurchaseReq = (req, res, next) => {
     try{
-        req.transaction = validateTransaction(req.body, req.transactionId);
+        req.purchase = validatePurchase(req.body, req.purchaseId);
         next();
     }catch(err){
         next(err);
@@ -57,6 +57,6 @@ module.exports = {
     validateEnvelopeReq,
     validateIdParam,
     validateReqTransferBudget,
-    validateTransactionReq
+    validatePurchaseReq
 };
 

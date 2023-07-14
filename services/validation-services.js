@@ -126,8 +126,8 @@ const validateBudget = function (budget){
     }
 };
 
-//Creates a schema to validate transaction objects
-const transactionSchema = new Schema({
+//Creates a schema to validate purchase objects
+const purchaseSchema = new Schema({
     id: {
         type: String,
         required: false    
@@ -146,52 +146,52 @@ const transactionSchema = new Schema({
     }
 }, {strict: true});
 
-//Validates a transaction object
-//A successfully validated transaction will conform to {id: v4 UUID string/undefined, envelope_id: v4 UUID string, description: string, amount: xxxx.xx number}
-const validateTransaction = function (transaction, id){
+//Validates a purchase object
+//A successfully validated purchase will conform to {id: v4 UUID string/undefined, envelope_id: v4 UUID string, description: string, amount: xxxx.xx number}
+const validatePurchase = function (purchase, id){
     let validationErrors;
-    //Validates the format of the transaction and sets validationErrors equal to an array of errors if any
-    validationErrors = transactionSchema.validate(transaction);
+    //Validates the format of the purchase and sets validationErrors equal to an array of errors if any
+    validationErrors = purchaseSchema.validate(purchase);
     //Checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
     try{
-        if(transaction.id){
-            validateId(transaction.id);
+        if(purchase.id){
+            validateId(purchase.id);
         }
     }catch(err){
         validationErrors.push(err.message);
     }
-    //Checks that the transaction id matches the provided id (i.e. the one supplied by a parameter etc) and adds an error to the array if not
-    if(transaction.id && id){
-        if(transaction.id !== id){
+    //Checks that the purchase id matches the provided id (i.e. the one supplied by a parameter etc) and adds an error to the array if not
+    if(purchase.id && id){
+        if(purchase.id !== id){
             validationErrors.push('Error: there is an id mismatch.');
         }
     }
-    //Adds an error to the array in cases where no id is provided (i.e. one hasn't been assigned yet etc.), but the transaction contains an id
-    if(transaction.id && !id){
+    //Adds an error to the array in cases where no id is provided (i.e. one hasn't been assigned yet etc.), but the purchase contains an id
+    if(purchase.id && !id){
         validationErrors.push('Error: there is an id mismatch.');
     }
-    //Standardizes the transaction by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't exist
-    if(!transaction.id){
-        transaction = {'id': id, ...transaction};
+    //Standardizes the purchase by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't exist
+    if(!purchase.id){
+        purchase = {'id': id, ...purchase};
     }
     //Checks that the envelope_id is a valid v4 UUID and adds an error to the array if not
     try{
-        validateId(transaction.envelope_id);
+        validateId(purchase.envelope_id);
     }catch(err){
         validationErrors.push(err.message);
     }
     //Checks that the amount follows the xxxx.xx format and adds an error to the array if not
     try{
-        validateMoney(transaction.amount);
+        validateMoney(purchase.amount);
     }catch(err){
         validationErrors.push(err.message);
     }
     //Checks if any errors have been recorded and if not, returns the budget
     if(validationErrors.length === 0){
-        return transaction;
+        return purchase;
     //In case of errors, creates and throws a new error object describing all invalid formatting
     }else{
-        const err = new Error(`The transaction format is invalid.\n ${validationErrors.join("\n")}`);
+        const err = new Error(`The purchase format is invalid.\n ${validationErrors.join("\n")}`);
         err.status = 400;
         throw err;
     }
@@ -205,5 +205,5 @@ module.exports = {
     validateId,
     validateEnvelope,
     validateBudget,
-    validateTransaction
+    validatePurchase
 };

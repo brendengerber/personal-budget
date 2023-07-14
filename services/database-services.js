@@ -116,16 +116,21 @@ const deleteEntry = (entryId, tableName) => {
     }).catch(err => handleTransactionErr(err));
  };
 
-//  const addColumnToColumn = (fromTable, fromColumn, fromId, toTable, toColumn, toId) => {
-//     return db.tx(t => {
-//         return t.batch([
-//             t.one(),
-//             t.one()
-//         ])
-//     }).catch(err => {
+ const subtractColumnFromColumn = (fromTable, fromColumn, fromId, toTable, toColumn, toId) => {
+    //Quries the fromTable to get the amount to subtract from the toTable
+    let subtractionAmount = db.one('SELECT ${column:name} FROM ${table:name} WHERE id = ${id:csv}', {
+        column: fromColumn,
+        table: fromTable,
+        id: fromId
+    }).catch(err => handleQueryErr(err));
+    return db.one('UPDATE $table:name SET ${column:name} = ${column:name} - ${amount:csv} WHERE id = ${id:csv}', {
+        table: toTable,
+        column: toColumn,
+        amount: subtractionAmount,
+        id: toId
+    }).catch(err => handleQueryErr(err));
+ }
 
-//     })
-//  }
 
 
 //Exports functions to be used in other modules
@@ -136,5 +141,5 @@ module.exports = {
     addEntry,
     updateEntry,
     deleteEntry,
-    transferAmountBetweenColumns
+    subtractColumnFromColumn
 };
