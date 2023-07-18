@@ -8,6 +8,12 @@
 const {db} = require('../queries.js');
 const {handleQueryErr} = require('../utilities/database-utilities.js');
 
+//Sets node pg to store the date without time
+const pg = require('pg');
+pg.types.setTypeParser(1082, function(stringValue) {
+    return stringValue;
+  });
+
 //Returns an array of all entries from a table
 const getAllEntries = (tableName) => {
     //Queries the database to get all entries and returns the result
@@ -39,18 +45,21 @@ const getMatchingEntries = (tableName, column, value) => {
 //Uses the properties of the entry object to create a custom query statement
 //Entry must begin with an undefined id property which will be assigned by the query
 //Entry properties must match the columns of a table
-const addEntry = (entry, tableName) => {
+const addEntry = async (entry, tableName) => {
     //Uses the entry object to create arrays containing the columns and values to add
     let columnsArray = Object.getOwnPropertyNames(entry);
     columnsArray = columnsArray.slice(1);
     let valuesArray = Object.values(entry);
     valuesArray = valuesArray.slice(1);   
     //Queries the database to add the entry and returns the result
-    return db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
+    let asdf = await db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
         table: tableName,
         columns: columnsArray,
         values: valuesArray
-    }).catch(err => handleQueryErr(err));
+    }
+    ).catch(err => handleQueryErr(err));
+    console.log(asdf)
+    return asdf
 };
 
 //Updates the entry by id in a table

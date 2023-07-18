@@ -21,23 +21,27 @@ adding purchase time to date for some reason when posting
 
 
 
-// adding transactions should remove budget from the envelope
-// add a monthly budget and a remaining budget to envelope
-// then subtract from the remaining budget
-// transfer budget should also take from remaining budget
-// then make the server reset the budget values at the end of the month
-// or have four tables current envelopes, some kind of reset envelopes, current transactions, archived transactions? thats a lot of worky tho
 
-// addTransaction processTransaction
+
+
+
+
+
+
+
+
+LATER
 
 // env file?
 
-
 // update should not update if property is null
 
-
-
 //**********New purchases that contain an envelope that doesnt exist get a foreign key error instead of envelope doesnt exist
+
+// add a monthly budget and a remaining budget to envelope
+// then make the server reset the budget values at the end of the month
+// or have four tables current envelopes, some kind of reset envelopes, current transactions, archived transactions? thats a lot of worky tho
+
 
 
 
