@@ -28,7 +28,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * New entries are auto-assigned a unique v4 UUID.
 ---
 ## **Summary of API Specification**
-### 1. ENVELOPES ENDPOINTS
+### **1. ENVELOPES ENDPOINTS**
 ### Endpoint: Get All Envelopes
 * Description: Gets all of the envelopes currently in the database
 * Path: `/api/envelopes`
@@ -36,10 +36,16 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Response: JSON array containing all envelopes
 
 ### Endpoint: Get Envelope By Id
-* Description: Returns the envelope with the specified Id from the database
+* Description: Returns the envelope of the specified Id from the database
 * Path: `/api/envelopes/{id}`
 * Method: `GET`
 * Response: JSON object containing the envelope of the specified Id
+
+### Endpoint: Get Envelope Purchases By Id
+* Description: Returns the purchases corresponding to the envelope of the specified Id from the database
+* Path: `/api/envelopes/{id}/purchases`
+* Method: `GET`
+* Response: JSON object containing an array of the purchases corresponding to envelope of the specified Id
 
 ### Endpoint: Add New Envelope
 * Description: Adds a new envelope to the database and assigns it a unique v4 UUID
@@ -68,7 +74,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Payload: JSON object `{"budget": xxxx.xx number}`
 * Response: JSON object containing an array of the updated envelopes
 
-### 2. PURCHASES ENDPOINTS
+### **2. PURCHASES ENDPOINTS**
 ### Endpoint: Get All Purchases
 * Description: Gets all of the purchases currently in the database
 * Path: `/api/purchases`
@@ -76,7 +82,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Response: JSON array containing all purchases
 
 ### Endpoint: Get Purchase By Id
-* Description: Returns the purchase with the specified Id from the database
+* Description: Returns the purchase of the specified Id from the database
 * Path: `/api/purchases/{id}`
 * Method: `GET`
 * Response: JSON object containing the purchase of the specified Id
