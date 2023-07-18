@@ -30,7 +30,7 @@ purchasesRouter.delete('/:id', deletePurchaseById, (req, res, next) => {
     res.status(200).send(req.purchaseDeleted);
 });
 
-//Puts a new purchase and sends an array consiting of the updated purchase and the cooresponding envelope with its updated budget
+//Updates a new purchase and sends an array consiting of the updated purchase and the cooresponding envelope with its updated budget
 //Body must be the new purchase in the form of a JSON object: {"id": v4 UUID string, "category": string, "budget": xxxx.xx number} or {"category": string, "budget": xxxx.xx number}
 purchasesRouter.put('/:id', validatePurchaseReq, updatePurchaseById, (req, res, next) => {
     res.status(200).send([req.purchase, req.envelope]);
