@@ -21,30 +21,10 @@ envelopesRouter.get('/:id', getEnvelopeById, (req, res, next) => {
     res.status(200).send(req.envelope);
 });
 
-
-
-
-
-
-
-
-
-
-
 //Gets all purchases associated with the specified envelope
 envelopesRouter.get('/:id/purchases', getEnvelopePurchasesById, (req, res, next) => {
     res.status(200).send(req.envelopePurchases);
 });
-
-
-
-
-
-
-
-
-
-
 
 //Posts a new envelope and sends the posted envelope along with the newly generated v4 UUID
 //Body must be the new envelope in the form of a JSON object: {"category": v4 UUID string, "budget": xxxx.xx number}

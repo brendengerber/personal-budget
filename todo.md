@@ -42,7 +42,6 @@ adding purchase time to date for some reason when posting
 
 
 
-//change everything using the batch function in services, break them up and do them in the middleware with batch
 
 
 

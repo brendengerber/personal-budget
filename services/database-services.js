@@ -3,31 +3,31 @@
 //They are generic and can be used dynamically on any table by multiple modules for multiple purposes
 //They are paramaterized and dynamic table/column names are escaped to avoid SQL injection 
 //If the data storage method is changed, these functions can be refactored to return the same results without affecting the rest of the server and allowing it to continue functioning as normal
-//******remove specified, too much */
 
 //Imports necessary modules
 const {db} = require('../queries.js');
-const {handleTransactionErr, handleQueryErr} = require('../utilities/database-utilities.js')
+const {handleQueryErr} = require('../utilities/database-utilities.js');
 
-//Returns an array of all entries from a specified table
+//Returns an array of all entries from a table
 const getAllEntries = (tableName) => {
-    //Queries the database to return all entries from  the specified table
+    //Queries the database to get all entries and returns the result
     return db.any('SELECT * FROM $1:name', [
         tableName
     ]).catch(err => handleQueryErr(err));
 };
 
-//Finds and returns the entry with the specified id from the specified table
+//Finds and returns the entry by id from a table
 const getEntryById = (entryId, tableName) => {
-    //Queries the database to find the entry of the specified id and returns the result
+    //Queries the database to get the entry and returns the result
     return db.one('SELECT * FROM $1:name WHERE id = $2', [
         tableName, 
         entryId
     ]).catch(err => handleQueryErr(err));
 };
 
-//Finds and returns the entries from a specified table that match a specified value in a specified column
+//Finds and returns the entries from a table that match a value in a column
 const getMatchingEntries = (tableName, column, value) => {
+    //Queries the database to get the matching entries and returns the result
     return db.any('SELECT * FROM $1:name WHERE $2:name = $3', [
         tableName, 
         column, 
@@ -35,10 +35,10 @@ const getMatchingEntries = (tableName, column, value) => {
     ]).catch(err => handleQueryErr(err));
 };
 
-//Adds an entry to the specified table and returns the entry along with the newly assigned v4 UUID
+//Adds an entry to a table and returns the entry along with the newly assigned v4 UUID
 //Uses the properties of the entry object to create a custom query statement
 //Entry must begin with an undefined id property which will be assigned by the query
-//Entry properties must match the columns of the table
+//Entry properties must match the columns of a table
 const addEntry = (entry, tableName) => {
     //Uses the entry object to create arrays containing the columns and values to add
     let columnsArray = Object.getOwnPropertyNames(entry);
@@ -53,7 +53,7 @@ const addEntry = (entry, tableName) => {
     }).catch(err => handleQueryErr(err));
 };
 
-//Updates the entry with the specified id in the specified table
+//Updates the entry by id in a table
 //Entry must be an object that begins with an id property
 //Entry properties must match the columns of the table
 const updateEntry = (entryId, entry, tableName) => {
@@ -69,18 +69,19 @@ const updateEntry = (entryId, entry, tableName) => {
     }).catch(err => handleQueryErr(err));
 };
 
-//Deletes an entry of specified ID from the specified table and returns the deleted entry
+//Deletes an entry by id from a table and returns the deleted entry
 const deleteEntry = (entryId, tableName) => {
-    //Queries the database to delete the entry of the specified id and returns the result
+    //Queries the database to delete the entry by id and returns the deleted entry
     return db.one('DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *', {
         table: tableName,
         id: entryId
     }).catch(err => handleQueryErr(err));
 }; 
 
-//Adds an amount to a column of an entry
+//Adds an amount to a column of an entry from a table
 //Column must be numeric or it will error
 const addToColumn = (tableName, columnName, entryId, amountToAdd) => {
+    //Queries the database to add to the column of the entry and returns the result
     return db.one('UPDATE ${table:name} SET ${column:name} = ${column:name} + ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
         table: tableName,
         column: columnName,
@@ -88,41 +89,6 @@ const addToColumn = (tableName, columnName, entryId, amountToAdd) => {
         id: entryId
     }).catch(err => handleQueryErr(err));
 };
-
- const subtractColumnFromColumn = (fromTable, fromColumn, fromId, toTable, toColumn, toId) => {
-    //Quries the fromTable to get the amount to subtract from the toTable
-    let subtractionAmount = db.one('SELECT ${column:name} FROM ${table:name} WHERE id = ${id:csv}', {
-        column: fromColumn,
-        table: fromTable,
-        id: fromId
-    }).catch(err => handleQueryErr(err));
-    return db.one('UPDATE $table:name SET ${column:name} = ${column:name} - ${amount:csv} WHERE id = ${id:csv}', {
-        table: toTable,
-        column: toColumn,
-        amount: subtractionAmount,
-        id: toId
-    }).catch(err => handleQueryErr(err));
- };
-
-
-
-
-
-//************renive */
-//Returns an array consiting of the new purchase with it's newly assigned v4 UUID and the cooresponding envelope with it's updated budget
-const addPurchaseAndSubtractBudgetFromEnvelope = (purchase) => {
-    return db.tx(t =>{
-        return t.batch([
-            addEntry(purchase, 'purchases'),
-            addToColumn('envelopes', 'budget', purchase.envelope_id, -purchase.amount)
-        ])
-    }).catch(err => handleTransactionErr(err));
- }
-
-
-
-
-
 
 //Exports functions to be used in other modules
 module.exports = {
@@ -132,7 +98,5 @@ module.exports = {
     addEntry,
     updateEntry,
     deleteEntry,
-    addToColumn,
-    subtractColumnFromColumn,
-    addPurchaseAndSubtractBudgetFromEnvelope
+    addToColumn
 };

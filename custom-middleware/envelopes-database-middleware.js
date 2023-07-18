@@ -3,7 +3,7 @@
 
 //Imports database services
 const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {batchQuery, handleQueryErr, handleTransactionErr} = require('../utilities/database-utilities.js')
+const {handleTransactionErr} = require('../utilities/database-utilities.js');
 const {db} = require('../queries.js');
 
 //Gets all envelopes and adds them to req.envelopes

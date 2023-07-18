@@ -1,6 +1,3 @@
-//*************NEED TO validate purchase objects in routes still */
-
-
 //Imports necessary modules
 const express = require('express');
 const {validateIdParam, validatePurchaseReq} = require('../custom-middleware/validation-middleware.js');
