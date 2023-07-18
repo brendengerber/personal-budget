@@ -104,18 +104,25 @@ const addToColumn = (tableName, columnName, entryId, amountToAdd) => {
     }).catch(err => handleQueryErr(err));
  };
 
+
+
+
+
+
  //Returns an array consiting of the new purchase with it's newly assigned v4 UUID and the cooresponding envelope with it's updated budget
  const addPurchaseAndSubtractBudgetFromEnvelope = (purchase) => {
     return db.tx(t =>{
         return t.batch([
             addEntry(purchase, 'purchases'),
-            t.one('UPDATE envelopes SET budget = budget - ${amount:csv} WHERE id = ${id:csv} RETURNING *', {
-                amount: purchase.amount,
-                id: purchase.envelope_id
-            })
+            addToColumn('envelopes', 'budget', purchase.envelope_id, -purchase.amount)
         ])
     }).catch(err => handleTransactionErr(err));
  }
+
+
+
+
+
 
 //Exports functions to be used in other modules
 module.exports = {
