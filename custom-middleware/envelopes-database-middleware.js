@@ -2,7 +2,9 @@
 //Middleware functions are in charge of calling the correct services with the correct arguments and attatching results to the req object
 
 //Imports database services
-const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, transferAmountBetweenColumns} = require('../services/database-services.js');
+const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
+const {handleTransactionErr} = require('../utilities/database-utilities.js')
+const {db} = require('../queries.js');
 
 //Gets all envelopes and adds them to req.envelopes
 const getAllEnvelopes = async (req, res, next) => {
@@ -64,10 +66,18 @@ const deleteEnvelopeById = async (req, res, next) => {
         next(err);
     }
 };
+
 //Transfers a specified budget from one specified envelope to a second specified envelope and attatches an array of the updated envelopes to req.updatedEnvelopes
+//Performs a batch query that will only succeed if all queries of the batch succeed
+//Handles any errors encountered and rolls back queries in case of a failure
 const transferEnvelopeBudgetByIds =  async (req, res, next) => {
     try{
-        req.updatedEnvelopes =  await transferAmountBetweenColumns("envelopes", "budget", req.envelopeFromId, "envelopes", "budget", req.envelopeToId, req.transferBudget);
+        req.updatedEnvelopes = await db.tx(t => {
+            return t.batch([
+                addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget),
+                addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget)
+            ]);
+        }).catch(err => handleTransactionErr(err));
         next();
     }catch(err){
         next(err);
