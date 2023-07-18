@@ -10,11 +10,8 @@ something about throwing 2 errors during the batch
 **It seems the problem is when passing promises as the arguments
 
 
-// adding transaction works but has wierd null result
-//can addTransactionAndSubtractBudgetFromEnvelope be made more generic using arguments instead of hard coded sql?
 
 
-adding purchase time to date for some reason when posting
 
 
 

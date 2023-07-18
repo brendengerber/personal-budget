@@ -52,14 +52,11 @@ const addEntry = async (entry, tableName) => {
     let valuesArray = Object.values(entry);
     valuesArray = valuesArray.slice(1);   
     //Queries the database to add the entry and returns the result
-    let asdf = await db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
+    return db.one("INSERT INTO ${table:name} (${columns:name}) VALUES (${values:csv}) RETURNING *", {
         table: tableName,
         columns: columnsArray,
         values: valuesArray
-    }
-    ).catch(err => handleQueryErr(err));
-    console.log(asdf)
-    return asdf
+    }).catch(err => handleQueryErr(err));
 };
 
 //Updates the entry by id in a table

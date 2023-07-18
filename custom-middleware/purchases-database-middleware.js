@@ -1,6 +1,6 @@
 //Imports database services
 const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {handleTransactionErr} = require('../utilities/database-utilities.js')
+const {batchQuery} = require('../utilities/database-utilities.js')
 const {db} = require('../queries.js');
 
 //Gets all purchases and adds them to req.purchase
@@ -24,14 +24,13 @@ const getPurchaseById =  async (req, res, next) => {
 };
 
 //Adds a purchase, assigns it a v4 UUID, updates the budget of the corrisponding envelope, attatches the purchase along with its new v4 UUID to req.purchase, and attatches the updated envelope to req.envelope
-const processPurchase = async (req, res, next) => {
+const addPurchase = async (req, res, next) => {
     try{
-        let updatedEntries = await db.tx(t =>{
-            return t.batch([
+        let updatedEntries = await batchQuery(() => 
+            [
                 addEntry(req.purchase, 'purchases'),
                 addToColumn('envelopes', 'budget', req.purchase.envelope_id, -req.purchase.amount)
-            ])
-        }).catch(err => handleTransactionErr(err));
+            ]);
         req.purchase = updatedEntries[0];
         req.envelope = updatedEntries[1];
         next();
@@ -45,12 +44,11 @@ const processPurchase = async (req, res, next) => {
 const updatePurchaseById = async (req, res, next) => {
     let oldPurchase = await getEntryById(req.purchase.id, 'purchases');
     try{
-        let updatedEntries = await db.tx(t =>{
-            return t.batch([
+        let updatedEntries = await batchQuery(() => 
+            [
                 updateEntry(req.purchase.id, req.purchase, 'purchases'),
                 addToColumn('envelopes', 'budget', req.purchase.envelope_id, oldPurchase.amount - req.purchase.amount)
             ]);
-        }).catch(err => handleTransactionErr(err));
         req.purchase = updatedEntries[0];
         req.envelope = updatedEntries[1];
         next();
@@ -73,7 +71,7 @@ const deletePurchaseById = async (req, res, next) => {
 module.exports = {
     getAllPurchases,
     getPurchaseById,
-    processPurchase,
+    addPurchase,
     updatePurchaseById,
     deletePurchaseById
 };

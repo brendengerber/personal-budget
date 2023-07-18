@@ -39,12 +39,12 @@ const handleQueryErr = (err) => {
 };
 
 //Performs a batch query that will only succeed if all queries of the batch succeed
-//Takes an array of queries that return promises and can take database-services.js functions as part of the array
+//Takes a callback that returns an array of queries that return promises and can take database-services.js functions as part of the array
+//A callback must be used so query services are called in the batch method rather than immediately if an array of services was used as the argument instead
 //Handles any errors encountered and rolls back any queries in case of a failure
-//********does not work in case of a database error such as being shut off */
-const batchQuery = (queryArray) => {
+const batchQuery = (queryArrayCallback) => {
     return db.tx(t => {
-        return t.batch(queryArray);
+        return t.batch(queryArrayCallback());
     }).catch(err => handleTransactionErr(err));
 };
 

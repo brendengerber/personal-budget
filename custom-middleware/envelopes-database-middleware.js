@@ -3,7 +3,7 @@
 
 //Imports database services
 const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {handleTransactionErr} = require('../utilities/database-utilities.js');
+const {batchQuery} = require('../utilities/database-utilities.js');
 const {db} = require('../queries.js');
 
 //Gets all envelopes and adds them to req.envelopes
@@ -72,16 +72,11 @@ const deleteEnvelopeById = async (req, res, next) => {
 //Handles any errors encountered and rolls back queries in case of a failure
 const transferEnvelopeBudgetByIds =  async (req, res, next) => {
     try{
-        // req.updatedEnvelopes = await batchQuery([
-        //     addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget).catch(err => handleQueryErr(err)),
-        //     addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget).catch(err => handleQueryErr(err))
-        // ])
-        req.updatedEnvelopes = await db.tx(t => {
-            return t.batch([
-                addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget),
-                addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget)
-            ]);
-        }).catch(err => handleTransactionErr(err));
+        req.updatedEnvelopes = await batchQuery(() => 
+        [
+            addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget),
+            addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget)
+        ]);  
         next();
     }catch(err){
         next(err);
