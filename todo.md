@@ -14,15 +14,11 @@ something about throwing 2 errors during the batch
 //can addTransactionAndSubtractBudgetFromEnvelope be made more generic using arguments instead of hard coded sql?
 
 
+adding purchase time to date for some reason when posting
 
 
-//check validation working for transactions
-// add undefined id to posts
-// do transactions get mismatch if an id is included in the param but a different one in the body?
-// what if there is an id included with the post?
 
 
-// add date to transaction and validation
 
 
 // adding transactions should remove budget from the envelope
@@ -41,6 +37,7 @@ something about throwing 2 errors during the batch
 
 
 
+//**********New purchases that contain an envelope that doesnt exist get a foreign key error instead of envelope doesnt exist
 
 
 
@@ -89,27 +86,3 @@ something about throwing 2 errors during the batch
 
 
 
-
-    if(err.data){
-        failedIdx = err.data.findIndex(e => !e.success);
-    }else{
-        err.message = 'Error: the system encountered an unknown error.'
-        throw err;
-    }
-
-
-
-            //Finds the index of the first query of the transaction that failed
-        const failedIdx = err.data.findIndex(e => !e.success);
-        //Handles the err resluting from one of the entries not existing
-        //Called if there is a failed query that doesn't contain a database error code
-        if((failedIdx || failedIdx === 0) && !err.data[failedIdx].result.code){
-            err.message = 'Error: one of the requested entries does not exist.';
-            err.status = 404;
-            throw err;
-        //Handles the err in case of some other unforseen database error
-        //Called if there is a failed query that does contain a database error code
-        }else{
-            err.message = `Error: Database server encountered an error with code ${err.data[failedIdx].result.code}.`;
-            throw err;
-        }

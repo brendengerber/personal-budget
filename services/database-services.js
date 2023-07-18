@@ -108,9 +108,9 @@ const addToColumn = (tableName, columnName, entryId, amountToAdd) => {
 
 
 
-
- //Returns an array consiting of the new purchase with it's newly assigned v4 UUID and the cooresponding envelope with it's updated budget
- const addPurchaseAndSubtractBudgetFromEnvelope = (purchase) => {
+//************renive */
+//Returns an array consiting of the new purchase with it's newly assigned v4 UUID and the cooresponding envelope with it's updated budget
+const addPurchaseAndSubtractBudgetFromEnvelope = (purchase) => {
     return db.tx(t =>{
         return t.batch([
             addEntry(purchase, 'purchases'),

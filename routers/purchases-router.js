@@ -22,7 +22,7 @@ purchasesRouter.get('/:id', getPurchaseById, (req, res, next) => {
     res.status(200).send(req.purchase);
 });
 
-//Post a new purchase and sends an array consiting of the new purchase with its newly assigned v4 UUID and the cooresponding envelope with its updated budget
+//Posts a new purchase and sends an array consiting of the new purchase with its newly assigned v4 UUID and the cooresponding envelope with its updated budget
 //Body must be the new purchase in the form of a JSON object: {"envelope_id": v4 UUID string, amount: xxxx.xx number}
 purchasesRouter.post('/', validatePurchaseReq, processPurchase, (req, res, next) => {
     res.status(201).send([req.purchase, req.envelope]);
@@ -33,10 +33,10 @@ purchasesRouter.delete('/:id', deletePurchaseById, (req, res, next) => {
     res.status(200).send(req.purchaseDeleted);
 });
 
-//Updates the purchase with the specified id and sends the newly updated purchase
+//Puts a new purchase and sends an array consiting of the updated purchase and the cooresponding envelope with its updated budget
 //Body must be the new purchase in the form of a JSON object: {"id": v4 UUID string, "category": string, "budget": xxxx.xx number} or {"category": string, "budget": xxxx.xx number}
 purchasesRouter.put('/:id', validatePurchaseReq, updatePurchaseById, (req, res, next) => {
-    res.status(200).send(req.purchase);
+    res.status(200).send([req.purchase, req.envelope]);
 });
 
 //Exports the router

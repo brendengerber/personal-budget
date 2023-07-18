@@ -3,7 +3,6 @@ const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addToCol
 const {handleTransactionErr} = require('../utilities/database-utilities.js')
 const {db} = require('../queries.js');
 
-
 //Gets all purchases and adds them to req.purchase
 const getAllPurchases = async (req, res, next) => {
     try{
@@ -41,11 +40,19 @@ const processPurchase = async (req, res, next) => {
     }
 };
 
-//Updates the purchase of the specified id with a new purchase and attatches the updated purchase including id to req.purchase
+//Updates the purchase of the specified id with a new purchase, attatches the updated purchase to req.purchase, and attatches the corrisponding updated envelope to req.envelope
 //New purchase can either include or not include it's id, if it is included it will check to make sure it matches the parameter id
 const updatePurchaseById = async (req, res, next) => {
+    let oldPurchase = await getEntryById(req.purchase.id, 'purchases');
     try{
-        req.purchase = await updateEntry(req.purchaseId, req.envelope, 'purchases');
+        let updatedEntries = await db.tx(t =>{
+            return t.batch([
+                updateEntry(req.purchase.id, req.purchase, 'purchases'),
+                addToColumn('envelopes', 'budget', req.purchase.envelope_id, oldPurchase.amount - req.purchase.amount)
+            ]);
+        }).catch(err => handleTransactionErr(err));
+        req.purchase = updatedEntries[0];
+        req.envelope = updatedEntries[1];
         next();
     }catch(err){
         next(err);
