@@ -1,7 +1,7 @@
 # Personal Budget
 ## **Desctiption**
 
-This small api is based off of the envelope budgeting system. The concept is that a set of envelopes each represent a category of spending. The money you have to spend each month is divided accordingly and placed inside the corresponding envelope. When the time comes to pay for an expense, the money is withdrawn from the appropriate envelope. Portions of a budget can also be transferred from one envelope to another if the situation calls for it.  At the end of the month the money in the envelopes is refilled and the process begins again.
+This small api is based off of the envelope budgeting system. The concept is that a set of envelopes each represent a category of spending. The money you have to spend each month is divided accordingly and placed inside the corresponding envelope. When the time comes to pay for an expense, the money is withdrawn from the appropriate envelope. Money can also be transferred from one envelope to another if the situation calls for it.  At the end of the month the money in the envelopes is refilled and the process begins again.
 
 ## **Technologies**
 1. JavaScript
