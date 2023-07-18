@@ -1,6 +1,5 @@
 //This file contains validation services that validate user submitted data
 //They are kept separate not only to reuse, but also to separate functionality
-//**********add undefineds? */
 
 //Imports necessary modules
 const validator = require('validator');
@@ -26,7 +25,7 @@ const validateId = function(id){
     if(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(id)){
         return id;
     }else{
-        const err = new Error(`Error: the request ID ${id} is not a valid v4 UUID.`);
+        const err = new Error(`Error: the ID ${id} is not a valid v4 UUID.`);
         err.status = 400;
         throw err;
     }
@@ -34,17 +33,12 @@ const validateId = function(id){
 
 //Validates date properties of submitted entries to ensure they conforms to the YYYY-MM-DD date format
 //"date" is a string to validate
-//*************change to errors like the others, whats the point of undefined?
 const validateDate = function(date){
-    try{
-        if(typeof date !== 'string'){
-            return undefined;
-        }
-        if(!validator.isDate(date, {format: 'YYYY-MM-DD', delimiters: ['-']})){
-            return false;
-        }
-        return true;
-    }catch(err){
+    if(validator.isDate(date, {format: 'YYYY-MM-DD', delimiters: ['-']})){
+        return date;
+    }else{
+        const err = new Error(`Error: the date ${date} does not follow the YYYY-MM-DD date format.`);
+        err.status = 400;
         throw err;
     }
 };
@@ -99,7 +93,7 @@ const validateEnvelope = function(envelope, id){
     }
     //Checks that the budget follows the xxxx.xx format and adds an error to the array if not
     try{
-        validateMoney(envelope.budget)
+        validateMoney(envelope.budget);
     }catch(err){
         validationErrors.push(err.message);
     }
