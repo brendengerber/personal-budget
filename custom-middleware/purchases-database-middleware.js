@@ -1,3 +1,6 @@
+//Route functionality is kept here in seperate middleware functions to maintain separation of concerns and allow for re-use in multiple routes
+//Middleware functions are in charge of calling the correct services with the correct arguments and attatching results to the req object
+
 //Imports database services
 const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
 const {batchQuery} = require('../utilities/database-utilities.js')
