@@ -1,5 +1,6 @@
 //This file contains validation services that validate user submitted data
 //They are kept separate not only to reuse, but also to separate functionality
+//**********add undefineds? */
 
 //Imports necessary modules
 const validator = require('validator');
@@ -8,6 +9,7 @@ const Schema = require('validate');
 //Validates money values to ensure that they conforms to the xxxx.xx currency format and throws an error if not
 //Money with either 2, 1, or 0 decimals and no comma separators will validate
 //"money" is a string to validate
+
 const validateMoney = function(money){
     if(validator.isCurrency(money.toString(), {thousands_separator: '', digits_after_decimal: [0, 1, 2]})){
         return money;
@@ -26,6 +28,23 @@ const validateId = function(id){
     }else{
         const err = new Error(`Error: the request ID ${id} is not a valid v4 UUID.`);
         err.status = 400;
+        throw err;
+    }
+};
+
+//Validates date properties of submitted entries to ensure they conforms to the YYYY-MM-DD date format
+//"date" is a string to validate
+//*************change to errors like the others, whats the point of undefined?
+const validateDate = function(date){
+    try{
+        if(typeof date !== 'string'){
+            return undefined;
+        }
+        if(!validator.isDate(date, {format: 'YYYY-MM-DD', delimiters: ['-']})){
+            return false;
+        }
+        return true;
+    }catch(err){
         throw err;
     }
 };
@@ -184,6 +203,12 @@ const validatePurchase = function (purchase, id){
     }catch(err){
         validationErrors.push(err.message);
     }
+    //Checks that the date format is valid and adds an error to the array if not
+    try{
+        validateDate(purchase.date)
+    }catch(err){
+        validationErrors.push(err.message)
+    }
     //Checks that the amount follows the xxxx.xx format and adds an error to the array if not
     try{
         validateMoney(purchase.amount);
@@ -205,6 +230,7 @@ const validatePurchase = function (purchase, id){
 module.exports = {
     validateMoney,
     validateId,
+    validateDate,
     validateEnvelope,
     validateBudget,
     validatePurchase
