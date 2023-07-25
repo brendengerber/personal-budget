@@ -1,6 +1,5 @@
 //Route functionality is kept here in seperate middleware functions to maintain separation of concerns and allow for re-use in multiple routes
 //Middleware functions are in charge of calling the correct services with the correct arguments and attatching results to the req object
-//********need to add comments to functions */ Like remove it and only put it in the catch block running the proper one before next(err) or in the promise catch (err => next(handleTransaction(err)))
 
 //Imports database services
 const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
@@ -28,9 +27,10 @@ const getPurchaseById =  async (req, res, next) => {
 };
 
 //Adds a purchase, assigns it a v4 UUID, updates the budget of the corrisponding envelope, attatches the purchase along with its new v4 UUID to req.purchase, and attatches the updated envelope to req.envelope
+//Performs a batch query that will only succeed if all queries of the batch succeed
+//Handles any errors encountered and rolls back queries in case of a failure
 const addPurchase = async (req, res, next) => {
     try{
-        //*********need to test rollback  */
         let updatedEntries = await db.tx(t => {
             return t.batch([
                 addEntry(req.purchase, 'purchases', t),
@@ -47,7 +47,6 @@ const addPurchase = async (req, res, next) => {
 
 //Updates the purchase of the specified id with a new purchase, attatches the updated purchase to req.purchase, and attatches the corrisponding updated envelope to req.envelope
 //New purchase can either include or not include it's id, if it is included it will check to make sure it matches the parameter id
-//*****need to test rollback */
 const updatePurchaseById = async (req, res, next) => {
     let oldPurchase = await getEntryById(req.purchase.id, 'purchases');
     try{

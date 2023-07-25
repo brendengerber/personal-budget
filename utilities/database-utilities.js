@@ -1,5 +1,5 @@
 //Imports necessary modules
-const {db} = require('../queries.js');
+// const {db} = require('../queries.js');
 
 //Processes an error thrown by a database transaction
 //This function separates if the error was thrown due to a resource not existing or due to some other database error
