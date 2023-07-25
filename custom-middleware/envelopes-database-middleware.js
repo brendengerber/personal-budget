@@ -3,7 +3,7 @@
 
 //Imports database services
 const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {batchQuery} = require('../utilities/database-utilities.js');
+const {handleTransactionErr} = require('../utilities/database-utilities.js');
 const {db} = require('../queries.js');
 
 //Gets all envelopes and adds them to req.envelopes
@@ -70,13 +70,26 @@ const deleteEnvelopeById = async (req, res, next) => {
 //Transfers a specified budget from one specified envelope to a second specified envelope and attatches an array of the updated envelopes to req.updatedEnvelopes
 //Performs a batch query that will only succeed if all queries of the batch succeed
 //Handles any errors encountered and rolls back queries in case of a failure
-const transferEnvelopeBudgetByIds =  async (req, res, next) => {
+const transferEnvelopeBudgetByIds = async (req, res, next) => {
     try{
-        req.updatedEnvelopes = await batchQuery(() => 
-        [
-            addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget),
-            addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget)
-        ]);  
+
+        // ****working logic without the batchQuery function */
+        req.updatedEnvelopes = await db.tx(t => {
+            return t.batch([
+                addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget, t),
+                addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget, t)
+            ])
+        }).catch(err => handleTransactionErr(err));
+
+
+        //******non working logic with batchQuery, doesn't roll back in failure */
+    // req.updatedEnvelopes = await batchQuery((t) => 
+    //     [
+    //         addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget, t),
+    //         addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget, t)
+    //     ]) 
+
+
         next();
     }catch(err){
         next(err);

@@ -44,7 +44,7 @@ const handleQueryErr = (err) => {
 //Handles any errors encountered and rolls back any queries in case of a failure
 const batchQuery = (queryArrayCallback) => {
     return db.tx(t => {
-        return t.batch(queryArrayCallback());
+        return t.batch(queryArrayCallback(t));
     }).catch(err => handleTransactionErr(err));
 };
 
