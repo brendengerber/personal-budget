@@ -1,40 +1,42 @@
 //Imports necessary modules
 const {db} = require('../queries.js');
 
-//Handles an error thrown by a database transaction
+//Processes an error thrown by a database transaction
 //This function separates if the error was thrown due to a resource not existing or due to some other database error
-const handleTransactionErr = (err) => {
+//Returns the err with newly added content to be handled by middleware
+const processTransactionErr = (err) => {
     if(err.data){
         //Finds the index of the first query of the transaction that failed
         const failedIdx = err.data.findIndex(e => !e.success);
-        //Handles the err resluting from one of the entries not existing
+        //Processes the err resluting from one of the entries not existing
         //Called if there is a failed query that doesn't contain a database error code
         if((failedIdx || failedIdx === 0) && !err.data[failedIdx].result.code){
             err.message = 'Error: one of the requested entries does not exist.';
             err.status = 404;
-            throw err;
-        //Handles the err in case of some other unforseen database error
+            return err;
+        //Processes the err in case of some other unforseen database error
         //Called if there is a failed query that does contain a database error code
         }else{
             err.message = `Error: Database server encountered an error with code ${err.data[failedIdx].result.code}.`;
-            throw err;
+            return err;
         }
     }else{
         err.message = `Error: Database server encountered an error with code ${err.code}.`
-        throw err;
+        return err;
     }
 };
 
-//Handles an error thrown by a standard query
+//Processes an error thrown by a standard query
 //This function separates if the error was thrown due to a resource not existing or due to some other database error
-const handleQueryErr = (err) => {
+//Returns the err with newly added content to be handled by middleware
+const processQueryErr = (err) => {
     if(!err.code){
         err.message = 'Error: the requested entry does not exist.';
         err.status = 404;
-        throw err;
+        return err;
     }else{
         err.message = `Error: Database server encountered an error with code ${err.code}.`;
-        throw err;
+        return err;
     }
 };
 
@@ -42,16 +44,16 @@ const handleQueryErr = (err) => {
 //Takes a callback that returns an array of queries that return promises and can take database-services.js functions as part of the array
 //A callback must be used so query services are called in the batch method rather than immediately if an array of services was used as the argument instead
 //Handles any errors encountered and rolls back any queries in case of a failure
-const batchQuery = (queryArrayCallback) => {
-    return db.tx(t => {
-        return t.batch(queryArrayCallback(t));
-    }).catch(err => handleTransactionErr(err));
-};
+//***This is not working currently
+// const batchQuery = (queryArrayCallback) => {
+//     return db.tx(t => {
+//         return t.batch(queryArrayCallback(t));
+//     }).catch(err => handleTransactionErr(err));
+// };
 
 //Exports functions to be used in other modules
 module.exports = {
-    handleTransactionErr,
-    handleQueryErr,
-    batchQuery
+    processTransactionErr,
+    processQueryErr
 };
 

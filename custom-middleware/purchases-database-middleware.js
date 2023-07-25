@@ -4,7 +4,7 @@
 
 //Imports database services
 const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {handleTransactionErr} = require('../utilities/database-utilities.js');
+const {processQueryErr, processTransactionErr} = require('../utilities/database-utilities.js');
 const {db} = require('../queries.js');
 
 //Gets all purchases and adds them to req.purchase
@@ -13,7 +13,7 @@ const getAllPurchases = async (req, res, next) => {
         req.purchases = await getAllEntries('purchases');
         next();
     }catch(err){
-        next(err);
+        next(processQueryErr(err));
     }
 };
 
@@ -23,7 +23,7 @@ const getPurchaseById =  async (req, res, next) => {
         req.purchase =  await getEntryById(req.purchaseId, 'purchases');
         next();
     }catch(err){
-        next(err);
+        next(processQueryErr(err));
     }
 };
 
@@ -36,12 +36,12 @@ const addPurchase = async (req, res, next) => {
                 addEntry(req.purchase, 'purchases', t),
                 addToColumn('envelopes', 'budget', req.purchase.envelope_id, -req.purchase.amount, t)
             ])
-        }).catch(err => handleTransactionErr(err));
+        });
         req.purchase = updatedEntries[0];
         req.envelope = updatedEntries[1];
         next();
     }catch (err){
-        next(err);
+        next(processTransactionErr(err));
     }
 };
 
@@ -56,12 +56,12 @@ const updatePurchaseById = async (req, res, next) => {
                 updateEntry(req.purchase.id, req.purchase, 'purchases', t),
                 addToColumn('envelopes', 'budget', req.purchase.envelope_id, oldPurchase.amount - req.purchase.amount, t)
             ])
-        }).catch(err => handleTransactionErr(err));
+        });
         req.purchase = updatedEntries[0];
         req.envelope = updatedEntries[1];
         next();
     }catch(err){
-        next(err);
+        next(processTransactionErr(err));
     }
 };
 
@@ -71,7 +71,7 @@ const deletePurchaseById = async (req, res, next) => {
         req.purchaseDeleted  = await deleteEntry(req.purchaseId, 'purchases');
         next();
     }catch(err){
-        next(err);
+        next(processQueryErr(err));
     }
 };
 

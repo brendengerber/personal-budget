@@ -3,12 +3,9 @@
 //They are generic and can be used dynamically on any table by multiple modules for multiple purposes
 //They are paramaterized and dynamic table/column names are escaped to avoid SQL injection 
 //If the data storage method is changed, these functions can be refactored to return the same results without affecting the rest of the server and allowing it to continue functioning as normal
-//*******move error handling only to middleware?
-//******change dbs to context */
 
 //Imports necessary modules
 const {db} = require('../queries.js');
-const {handleQueryErr} = require('../utilities/database-utilities.js');
 
 //Sets node pg to store the date without time
 const pg = require('pg');
@@ -25,7 +22,7 @@ const getAllEntries = (tableName, context) => {
     //Queries the database to get all entries and returns the result
     return context.any('SELECT * FROM $1:name', [
         tableName
-    ]).catch(err => handleQueryErr(err));
+    ]);
 };
 
 //Finds and returns the entry by id from a table
@@ -38,7 +35,7 @@ const getEntryById = (entryId, tableName, context) => {
     return context.one('SELECT * FROM $1:name WHERE id = $2', [
         tableName, 
         entryId
-    ]).catch(err => handleQueryErr(err));
+    ]);
 };
 
 //Finds and returns the entries from a table that match a value in a column
@@ -52,7 +49,7 @@ const getMatchingEntries = (tableName, column, value, context) => {
         tableName, 
         column, 
         value
-    ]).catch(err => handleQueryErr(err));
+    ]);
 };
 
 //Adds an entry to a table and returns the entry along with the newly assigned v4 UUID
@@ -74,7 +71,7 @@ const addEntry = async (entry, tableName, context) => {
         table: tableName,
         columns: columnsArray,
         values: valuesArray
-    }).catch(err => handleQueryErr(err));
+    });
 };
 
 //Updates the entry by id in a table
@@ -94,7 +91,7 @@ const updateEntry = (entryId, entry, tableName, context) => {
         columns: columnsArray,
         values: valuesArray,
         id: entryId
-    }).catch(err => handleQueryErr(err));
+    });
 };
 
 //Deletes an entry by id from a table and returns the deleted entry
@@ -107,7 +104,7 @@ const deleteEntry = (entryId, tableName, context) => {
     return context.one('DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *', {
         table: tableName,
         id: entryId
-    }).catch(err => handleQueryErr(err));
+    });
 }; 
 
 //Adds an amount to a column of an entry from a table
@@ -123,7 +120,7 @@ const addToColumn = (tableName, columnName, entryId, amountToAdd, context) => {
         column: columnName,
         amount: amountToAdd,
         id: entryId
-    }).catch(err => handleQueryErr(err));
+    });
 };
 
 //Exports functions to be used in other modules
