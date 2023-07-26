@@ -3,6 +3,7 @@
 //They are generic and can be used dynamically on any table by multiple modules for multiple purposes
 //They are paramaterized and dynamic table/column names are escaped to avoid SQL injection 
 //If the data storage method is changed, these functions can be refactored to return the same results without affecting the rest of the server and allowing it to continue functioning as normal
+//All error processing will be done in services and thrown to catch in middleware
 
 //Imports necessary modules
 const {db} = require('../queries.js');
