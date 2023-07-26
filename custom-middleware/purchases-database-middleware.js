@@ -3,7 +3,7 @@
 
 //Imports database services
 const {getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {processQueryErr, processTransactionErr} = require('../utilities/database-utilities.js');
+const {batchQuery} = require('../utilities/database-utilities.js');
 const {db} = require('../queries.js');
 
 //Gets all purchases and adds them to req.purchase
@@ -12,7 +12,7 @@ const getAllPurchases = async (req, res, next) => {
         req.purchases = await getAllEntries('purchases');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -22,7 +22,7 @@ const getPurchaseById =  async (req, res, next) => {
         req.purchase =  await getEntryById(req.purchaseId, 'purchases');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -31,17 +31,15 @@ const getPurchaseById =  async (req, res, next) => {
 //Handles any errors encountered and rolls back queries in case of a failure
 const addPurchase = async (req, res, next) => {
     try{
-        let updatedEntries = await db.tx(t => {
-            return t.batch([
-                addEntry(req.purchase, 'purchases', t),
-                addToColumn('envelopes', 'budget', req.purchase.envelope_id, -req.purchase.amount, t)
-            ])
-        });
+        let updatedEntries = await batchQuery(batchContext => [
+            addEntry(req.purchase, 'purchases', batchContext),
+            addToColumn('envelopes', 'budget', req.purchase.envelope_id, -req.purchase.amount, batchContext)
+        ]);
         req.purchase = updatedEntries[0];
         req.envelope = updatedEntries[1];
         next();
-    }catch (err){
-        next(processTransactionErr(err));
+    }catch(err){
+        next(err);
     }
 };
 
@@ -50,17 +48,15 @@ const addPurchase = async (req, res, next) => {
 const updatePurchaseById = async (req, res, next) => {
     let oldPurchase = await getEntryById(req.purchase.id, 'purchases');
     try{
-        let updatedEntries = await db.tx(t => {
-            return t.batch([
-                updateEntry(req.purchase.id, req.purchase, 'purchases', t),
-                addToColumn('envelopes', 'budget', req.purchase.envelope_id, oldPurchase.amount - req.purchase.amount, t)
-            ])
-        });
+        let updatedEntries = await batchQuery(batchContext => [
+            updateEntry(req.purchase.id, req.purchase, 'purchases', batchContext),
+            addToColumn('envelopes', 'budget', req.purchase.envelope_id, oldPurchase.amount - req.purchase.amount, batchContext)
+        ]);
         req.purchase = updatedEntries[0];
         req.envelope = updatedEntries[1];
         next();
     }catch(err){
-        next(processTransactionErr(err));
+        next(err);
     }
 };
 
@@ -70,7 +66,7 @@ const deletePurchaseById = async (req, res, next) => {
         req.purchaseDeleted  = await deleteEntry(req.purchaseId, 'purchases');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 

@@ -3,8 +3,7 @@
 
 //Imports database services
 const {getAllEntries, getEntryById, getMatchingEntries, addEntry, updateEntry, deleteEntry, addToColumn} = require('../services/database-services.js');
-const {processQueryErr, processTransactionErr} = require('../utilities/database-utilities.js');
-const {db} = require('../queries.js');
+const {batchQuery} = require('../utilities/database-utilities.js');
 
 //Gets all envelopes and adds them to req.envelopes
 const getAllEnvelopes = async (req, res, next) => {
@@ -12,7 +11,7 @@ const getAllEnvelopes = async (req, res, next) => {
         req.envelopes = await getAllEntries('envelopes');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -22,7 +21,7 @@ const getEnvelopeById =  async (req, res, next) => {
         req.envelope =  await getEntryById(req.envelopeId, 'envelopes');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -32,7 +31,7 @@ const getEnvelopePurchasesById = async (req, res, next) => {
         req.envelopePurchases = await getMatchingEntries('purchases', 'envelope_id', req.envelopeId);
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -42,7 +41,7 @@ const addEnvelope = async (req, res, next) => {
         req.envelope = await addEntry(req.envelope, 'envelopes');
         next();
     }catch (err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -53,7 +52,7 @@ const updateEnvelopeById = async (req, res, next) => {
         req.envelope = await updateEntry(req.envelopeId, req.envelope, 'envelopes');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -63,7 +62,7 @@ const deleteEnvelopeById = async (req, res, next) => {
         req.envelopeDeleted  = await deleteEntry(req.envelopeId, 'envelopes');
         next();
     }catch(err){
-        next(processQueryErr(err));
+        next(err);
     }
 };
 
@@ -72,15 +71,13 @@ const deleteEnvelopeById = async (req, res, next) => {
 //Handles any errors encountered and rolls back queries in case of a failure
 const transferEnvelopeBudgetByIds = async (req, res, next) => {
     try{
-        req.updatedEnvelopes = await db.tx(t => {
-            return t.batch([
-                addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget, t),
-                addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget, t)
-            ])
-        });
+        req.updatedEnvelopes = await batchQuery(batchContext => [
+            addToColumn('envelopes', 'budget', req.envelopeFromId, -req.transferBudget, batchContext),
+            addToColumn('envelopes', 'budget', req.envelopeToId, req.transferBudget, batchContext)
+        ]);
         next();
     }catch(err){
-        next(processTransactionErr(err));
+        next(err)
     }
 };
 

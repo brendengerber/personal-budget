@@ -6,10 +6,11 @@
 
 //Imports necessary modules
 const {db} = require('../queries.js');
+const {processQueryErr} = require('../utilities/database-utilities.js');
 
 //Sets node pg to store the date without time
 const pg = require('pg');
-pg.types.setTypeParser(1082, function(stringValue) {
+pg.types.setTypeParser(1082, function(stringValue){
     return stringValue;
   });
 
@@ -22,7 +23,7 @@ const getAllEntries = (tableName, context) => {
     //Queries the database to get all entries and returns the result
     return context.any('SELECT * FROM $1:name', [
         tableName
-    ]);
+    ]).catch(err => processQueryErr(err));
 };
 
 //Finds and returns the entry by id from a table
@@ -35,7 +36,7 @@ const getEntryById = (entryId, tableName, context) => {
     return context.one('SELECT * FROM $1:name WHERE id = $2', [
         tableName, 
         entryId
-    ]);
+    ]).catch(err => processQueryErr(err));
 };
 
 //Finds and returns the entries from a table that match a value in a column
@@ -49,7 +50,7 @@ const getMatchingEntries = (tableName, column, value, context) => {
         tableName, 
         column, 
         value
-    ]);
+    ]).catch(err => processQueryErr(err));
 };
 
 //Adds an entry to a table and returns the entry along with the newly assigned v4 UUID
@@ -71,7 +72,7 @@ const addEntry = async (entry, tableName, context) => {
         table: tableName,
         columns: columnsArray,
         values: valuesArray
-    });
+    }).catch(err => processQueryErr(err));
 };
 
 //Updates the entry by id in a table
@@ -91,7 +92,7 @@ const updateEntry = (entryId, entry, tableName, context) => {
         columns: columnsArray,
         values: valuesArray,
         id: entryId
-    });
+    }).catch(err => processQueryErr(err));
 };
 
 //Deletes an entry by id from a table and returns the deleted entry
@@ -104,7 +105,7 @@ const deleteEntry = (entryId, tableName, context) => {
     return context.one('DELETE FROM ${table:name} WHERE id = ${id:csv} RETURNING *', {
         table: tableName,
         id: entryId
-    });
+    }).catch(err => processQueryErr(err));
 }; 
 
 //Adds an amount to a column of an entry from a table
@@ -120,7 +121,7 @@ const addToColumn = (tableName, columnName, entryId, amountToAdd, context) => {
         column: columnName,
         amount: amountToAdd,
         id: entryId
-    });
+    }).catch(err => processQueryErr(err));
 };
 
 //Exports functions to be used in other modules
