@@ -3,11 +3,16 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const {config} = require('./config.js');
+const cors = require('cors');
 
 const app = express();
 
 //Remove after development to minimize unnecessary realtime logs on server
 app.use(morgan('tiny'));
+
+//Enables cors to allow for Swagger tests on localhost
+//Remove once app is hosted
+app.use(cors());
 
 //Security measures
 app.use(helmet());
