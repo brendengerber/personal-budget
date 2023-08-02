@@ -54,7 +54,7 @@ const envelopeSchema = new Schema({
         required: true
     },
     budget: {
-        type: Number,
+        type: String,
         required: true    
     }
 }, {strict: true});
@@ -111,7 +111,7 @@ const validateEnvelope = function(envelope, id){
 //Creates a schema to validate budget objects
 const budgetSchema = new Schema({
     budget: {
-        type: Number,
+        type: String,
         required: true    
     }
 }, {strict: true});
@@ -158,7 +158,7 @@ const purchaseSchema = new Schema({
         required: true
     },
     amount: {
-        type: Number,
+        type: String,
         required: true
     }
 }, {strict: true});
