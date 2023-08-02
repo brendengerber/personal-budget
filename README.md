@@ -51,7 +51,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Description: Adds a new envelope to the database and assigns it a unique v4 UUID
 * Path: `/api/envelopes/`
 * Method: `POST`
-* Payload: JSON object `{"category": string, "budget": xxxx.xx number}`
+* Payload: JSON object `{"category": string, "budget": xxxx.xx string}`
 * Response: JSON object containing the envelope along with it's newly assigned v4 UUID
 
 ### Endpoint: Delete Envelope By Id
@@ -64,14 +64,14 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Description: Updates an envelope in the database with a specified new envelope
 * Path: `/api/envelopes/{id}`
 * Method: `PUT`
-* Payload: JSON object `{"category": string, "budget": xxxx.xx number}` OR `{"id": v4 UUID string, "category": string, "budget": xxxx.xx number}`
+* Payload: JSON object `{"category": string, "budget": xxxx.xx string}` OR `{"id": v4 UUID string, "category": string, "budget": xxxx.xx string}`
 * Response: JSON object containing the updated envelope
 
 ### Endpoint: Transfer Envelope Budget
 * Description: Updates two specified envelopes in the database by transfering a specified budget from one to another
 * Path: `/api/envelopes/{from-id}/transfer/{to-id}`
 * Method: `PUT`
-* Payload: JSON object `{"budget": xxxx.xx number}`
+* Payload: JSON object `{"budget": xxxx.xx string}`
 * Response: JSON object containing an array of the updated envelopes
 
 ### **2. PURCHASES ENDPOINTS**
@@ -91,7 +91,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Description: Adds a new purchase to the database, assigns it a unique v4 UUID, and updates the budget of the corresponding envelope by subtracting the purchase amount
 * Path: `/api/purchases/`
 * Method: `POST`
-* Payload: JSON object `{"envelope_id": v4 UUID string, "date": YYYY-MM-DD string, "description": string, "amount": xxxx.xx number}`
+* Payload: JSON object `{"envelope_id": v4 UUID string, "date": YYYY-MM-DD string, "description": string, "amount": xxxx.xx string}`
 * Response: JSON object containing an array with the purchase along with it's newly assigned v4 UUID, and the corresponding envelope along with it's updated budget
 
 ### Endpoint: Delete Purchase By Id
@@ -104,7 +104,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Description: Updates a purchase in the database with a specified new purchase and updates the corresponding envelope with a new budget based on the difference between the new and old purchase
 * Path: `/api/purchase/{id}`
 * Method: `PUT`
-* Payload: JSON object `{"envelope_id": v4 UUID string, "date": YYYY-MM-DD string, "description": string, "amount": xxxx.xx number}` OR `{"id": v4 UUID string, "envelope_id": v4 UUID string, "date": YYYY-MM-DD string, "description": string, "amount": xxxx.xx number}`
+* Payload: JSON object `{"envelope_id": v4 UUID string, "date": YYYY-MM-DD string, "description": string, "amount": xxxx.xx string}` OR `{"id": v4 UUID string, "envelope_id": v4 UUID string, "date": YYYY-MM-DD string, "description": string, "amount": xxxx.xx string}`
 * Response: JSON object containing an array with the updated purchase, and the corresponding envelope along with it's updated budget
 
 ## **Acknowledgement**
