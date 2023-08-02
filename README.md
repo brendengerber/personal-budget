@@ -30,7 +30,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 ## **Summary of API Specification**
 ### **1. ENVELOPES ENDPOINTS**
 ### Endpoint: Get All Envelopes
-* Description: Gets all of the envelopes currently in the database
+* Description: Gets all of the envelopes from the database
 * Path: `/api/envelopes`
 * Method: `GET`
 * Response: JSON array containing all envelopes
