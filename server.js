@@ -1,5 +1,3 @@
-//*********Copy this to the google doc? is it better ordering than that one? */
-
 //Imports necessary modules
 const express = require('express');
 const morgan = require('morgan');
