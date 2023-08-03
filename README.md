@@ -22,7 +22,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 ### 2. Paramaterized dynamic query functions.
 * Generic functions use arguments to build dynamic queries which can be reused on any table regardless of columns.
 * Queries are paramaterized to prevent SQL injection.
-* Dynamic table and column names are escaped to prevent SQL injection
+* Dynamic table and column names are escaped to prevent SQL injection.
 
 ### 3. Data stored in database. 
 * All data is stored in a PostgresSql database.
