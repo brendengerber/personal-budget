@@ -8,6 +8,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 2. Node.js 
 3. Express.js
 4. PostgresSql
+5. Openapi/Swagger
 ---
 ## **Features**
 
@@ -28,6 +29,8 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * New entries are auto-assigned a unique v4 UUID.
 ---
 ## **Summary of API Specification**
+Interactive swagger documentation can also be found [here](https://brendengerber.github.io/personal-budget/)
+(note: swagger testing will not work propperly unless the server is hosted, it is currently linked to localhost:3000)
 ### **1. ENVELOPES ENDPOINTS**
 ### Endpoint: Get All Envelopes
 * Description: Gets all of the envelopes from the database
