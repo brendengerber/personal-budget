@@ -11,7 +11,7 @@ const processTransactionErr = (err) => {
         //Processes the err resluting from one of the entries not existing
         //Called if there is a failed query that doesn't contain a database error code
         if((failedIdx || failedIdx === 0) && !err.data[failedIdx].result.code){
-            err.message = 'Error: one of the requested entries does not exist.';
+            err.message = 'Error: one or both of the requested entries do not exist.';
             err.status = 404;
             throw err;
         //Processes the err in case of some other unforseen database error
