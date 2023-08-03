@@ -10,7 +10,7 @@ const {validateId, validateEnvelope, validateBudget, validatePurchase} = require
 //A valid envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxxx.xx number}
 const validateEnvelopeReq = (req, res, next) => {
     try{
-        req.envelope = validateEnvelope(req.body, req.id);
+        req.envelope = validateEnvelope(req.body, req.envelopeId);
         next();
     } catch(err){
        next(err);
