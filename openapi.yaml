@@ -1,0 +1,664 @@
+openapi: 3.0.1
+servers:
+  - url: http://localhost:3000
+info:
+  title: Envelope Budget API
+  version: 1.0.0
+  description: A basic API for handling a budget using the envelope method.
+paths:
+  /api/envelopes:
+    get:
+      summary: Get All Envelopes
+      description: Gets all of the envelopes from the database
+      operationId: get_envelopes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Envelopes:
+                  value: |-
+                    [
+                        {
+                            "id": "e50bfbea-d0a8-4a42-ad5a-7854dab888d3",
+                            "category": "Entertainment",
+                            "budget": "1450.00"
+                        },
+                        {
+                            "id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                            "category": "Rent",
+                            "budget": "4500.00"
+                        },
+                        {
+                            "id": "9af321d6-6752-46e4-8560-b5af92601d0c",
+                            "category": "Groceries",
+                            "budget": "200.75"
+                        }
+                    ]
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+    post:
+      summary: Add New Envelope
+      description: Adds a new envelope to the database and assigns it a unique v4 UUID
+      operationId: add_new_envelope
+      requestBody:
+        description: A new envelope
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/envelope_no_id'
+            examples:
+              Envelope:
+                value: |-
+                  {
+                    "id": "f6a77460-0fb1-481f-8d63-8f931a048a4d",
+                    "category": "Toys",
+                    "budget": "450.00"
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/envelope'
+              examples:
+                New Envelope:
+                  value: |-
+                    {
+                      "id": "bfbf0bd1-d92a-41ce-af4f-3dbeb914154a",
+                      "category": "Toys",
+                      "budget": "450.00"
+                    }
+          links:
+            get_envelope_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `GET /api/envelopes/{id}`.
+              operationId: get_envelope_by_id
+              parameters:
+                id: $response.body#/id
+            delete_envelope_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `DELETE /api/envelope/{id}`.
+              operationId: delete_envelope_by_id
+              parameters:
+                id: $response.body#/id
+            update_envelope_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `PUT /api/envelopes/{id}`.
+              operationId: update_envelope_by_id
+              parameters:
+                id: $response.body#/id
+            get_envelope_purchases_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `GET /api/envelopes/{id}/purchases`.
+              operationId: get_envelope_purchases_by_id
+              parameters:
+                id: $response.body#/id
+            transfer_envelope_budget:
+              description: >
+                The `id` value returned in the response can be used as the
+                `from-id` or `to-id` parameters in `PUT
+                /api/envelopes/{from-id}/transfer/{to-id}`.
+              operationId: transfer_envelope_budget
+              parameters:
+                to-id: $response.body#/id
+                from-id: $response.body#/id
+        '400':
+          description: Bad Request
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Error:
+                  value: |-
+                    The envelope format is invalid
+                    Error: description of the formatting error.
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+  /api/envelopes/{id}:
+    get:
+      summary: Get Envelope By Id
+      description: Gets the envelope of the specified Id from the database
+      operationId: get_envelope_by_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/envelope'
+              examples:
+                Envelope:
+                  value: |-
+                    {
+                        "id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                        "category": "Rent",
+                        "budget": "4500.00"
+                    }
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+      parameters:
+        - $ref: '#/components/parameters/envelopeId'
+    delete:
+      summary: Delete Envelope By Id
+      description: Deletes an envelope from the database
+      operationId: delete_envelope_by_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/envelope'
+              examples:
+                Envelope:
+                  value: |-
+                    {
+                      "id": "f6a77460-0fb1-481f-8d63-8f931a048a4d",
+                      "category": "Toys",
+                      "budget": "1450.00"
+                    }
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+      parameters:
+        - $ref: '#/components/parameters/envelopeId'
+    put:
+      summary: Update Envelope By Id
+      description: Updates an envelope in the database with a specified new envelope
+      operationId: update_envelope_by_id
+      requestBody:
+        description: A new envelope
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/envelope'
+                - $ref: '#/components/schemas/envelope_no_id'
+            examples:
+              Envelope:
+                value: |-
+                  {
+                    "id": "f6a77460-0fb1-481f-8d63-8f931a048a4d",
+                    "category": "Toys",
+                    "budget": "1450.00"
+                  }
+              Envelope_No_Id:
+                value: |-
+                  {
+                    "category": "Toys",
+                    "budget": "1450.00"
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/envelope'
+              examples:
+                Envelope:
+                  value: |-
+                    {
+                      "id": "9af321d6-6752-46e4-8560-b5af92601d0c",
+                      "category": "Groceries",
+                      "budget": "2137.00"
+                    }
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+      parameters:
+        - $ref: '#/components/parameters/envelopeId'
+  /api/envelopes/{id}/purchases:
+    get:
+      summary: Get Envelope Purchases By Id
+      description: >-
+        Gets the purchases corresponding to the envelope of the specified Id
+        from the database
+      operationId: get_envelope_purchases_by_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Purchases:
+                  value: |-
+                    [
+                        {
+                            "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                            "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                            "date": "2021-01-01",
+                            "description": "somthing",
+                            "amount": "100.00"
+                        },
+                        {
+                            "id": "c991c15d-3384-4036-bb21-dd9af6593d7c",
+                            "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                            "date": "2021-01-01",
+                            "description": "somthing else",
+                            "amount": "200.00"
+                        }
+                    ]
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+      parameters:
+        - $ref: '#/components/parameters/envelopeId'
+  /api/envelopes/{from-id}/transfer/{to-id}:
+    put:
+      summary: Transfer Envelope Budget
+      description: >-
+        Updates two specified envelopes in the database by transfering a
+        specified budget from one to another
+      operationId: transfer_envelope_budget
+      requestBody:
+        description: A budget to transfer between envelopes
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/budget'
+            examples:
+              Envelope:
+                value: |-
+                  {
+                    "budget": "1450.00"
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Purchases:
+                  value: |-
+                    [
+                      {
+                          "id": "76d6e775-50e5-4a1f-b245-5de643a6eed9",
+                          "category": "Toys",
+                          "budget": "687.00"
+                      },
+                      {
+                          "id": "e50bfbea-d0a8-4a42-ad5a-7854dab888d3",
+                          "category": "Entertainment",
+                          "budget": "313.00"
+                      }
+                    ]
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found_batch'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Envelopes Endpoints
+      parameters:
+        - $ref: '#/components/parameters/envelopeFromId'
+        - $ref: '#/components/parameters/envelopeToId'
+  /api/purchases:
+    get:
+      summary: Get All Purchases
+      description: Gets all of the purchases currently in the database
+      operationId: get_all_purchases
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Purchases:
+                  value: |-
+                    [
+                      {
+                          "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                          "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                          "date": "2021-01-01",
+                          "description": "somthing",
+                          "amount": "100.00"
+                      },
+                      {
+                          "id": "c991c15d-3384-4036-bb21-dd9af6593d7c",
+                          "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                          "date": "2021-01-01",
+                          "description": "somthing",
+                          "amount": "100.00"
+                      },
+                      {
+                          "id": "7f971909-786d-4545-994f-7ebc347d761b",
+                          "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                          "date": "2021-01-01",
+                          "description": "somthing",
+                          "amount": "100.00"
+                      }
+                    ]
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Purchases Endpoints
+    post:
+      summary: Add New Purchase
+      description: >-
+        Adds a new purchase to the database, assigns it a unique v4 UUID, and
+        updates the budget of the corresponding envelope by subtracting the
+        purchase amount
+      operationId: add_new_purchase
+      requestBody:
+        description: A new purchase
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/purchase_no_id'
+            examples:
+              Purchase:
+                value: |-
+                  {
+                    "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                    "date": "2021-01-01",
+                    "description": "somthing",
+                    "amount": "100.00"
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Purchase:
+                  value: |-
+                    {
+                      "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                      "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                      "date": "2021-01-01",
+                      "description": "somthing",
+                      "amount": "100.00"
+                    }
+          links:
+            get_purchase_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `GET /api/purchases/{id}`.
+              operationId: get_purchases_by_id
+              parameters:
+                id: $response.body#/id
+            delete_purchase_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `DELETE /api/purchases/{id}`.
+              operationId: delete_purchases_by_id
+              parameters:
+                id: $response.body#/id
+            update_purchase_by_id:
+              description: >
+                The `id` value returned in the response can be used as the `id`
+                parameter in `PUT /api/purchases/{id}`.
+              operationId: update_purchases_by_id
+              parameters:
+                id: $response.body#/id
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Purchases Endpoints
+  /api/purchases/{id}:
+    get:
+      summary: Get Purchase By Id
+      description: Gets the purchase of the specified Id from the database
+      operationId: get_purchases_by_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Purchase:
+                  value: |-
+                    {
+                      "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                      "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                      "date": "2021-01-01",
+                      "description": "somthing",
+                      "amount": "100.00"
+                    }
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Purchases Endpoints
+      parameters:
+        - $ref: '#/components/parameters/purchaseId'
+    delete:
+      summary: Delete Purchase By Id
+      description: Deletes a purchse from the database
+      operationId: delete_purchase_by_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/purchase'
+              examples:
+                Purchase:
+                  value: |-
+                    {
+                      "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                      "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                      "date": "2021-01-01",
+                      "description": "somthing",
+                      "amount": "100.00"
+                    }
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Purchases Endpoints
+      parameters:
+        - $ref: '#/components/parameters/purchaseId'
+    put:
+      summary: Update Purchas By Id
+      description: >-
+        Description: Updates a purchase in the database with a specified new
+        purchase and updates the corresponding envelope with a new budget based
+        on the difference between the new and old purchase
+      operationId: update_purchase_by_id
+      requestBody:
+        description: A new purchase
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/purchase'
+                - $ref: '#/components/schemas/purchase_no_id'
+            examples:
+              Purchase:
+                value: |-
+                  {
+                    "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                    "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                    "date": "2021-01-01",
+                    "description": "somthing",
+                    "amount": "100.00"
+                  }
+              Purchase_No_Id:
+                value: |-
+                  {
+                    "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                    "date": "2021-01-01",
+                    "description": "somthing",
+                    "amount": "100.00"
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/purchase'
+              examples:
+                Purchase:
+                  value: |-
+                    {
+                      "id": "2a999b47-47bb-411f-a703-34c122101aed",
+                      "envelope_id": "d5c1f703-416f-49e5-8ced-f8c9e66c0423",
+                      "date": "2021-01-01",
+                      "description": "somthing",
+                      "amount": "100.00"
+                    }
+        '400':
+          $ref: '#/components/responses/400_invalid_v4UUID'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+        '500':
+          $ref: '#/components/responses/500_internal_server_error'
+      tags:
+        - Purchases Endpoints
+      parameters:
+        - $ref: '#/components/parameters/purchaseId'
+components:
+  schemas:
+    envelope:
+      type: object
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        budget:
+          type: string
+    envelope_no_id:
+      type: object
+      properties:
+        category:
+          type: string
+        budget:
+          type: string
+    purchase:
+      type: object
+      properties:
+        id:
+          type: string
+        envelope_id:
+          type: string
+        date:
+          type: string
+        description:
+          type: string
+        ammount:
+          type: string
+    purchase_no_id:
+      type: object
+      properties:
+        envelope_id:
+          type: string
+        date:
+          type: string
+        description:
+          type: string
+        ammount:
+          type: string
+    budget:
+      type: object
+      properties:
+        budget:
+          type: string
+  parameters:
+    envelopeId:
+      name: id
+      in: path
+      description: The v4 UUID of a specific envelope
+      required: true
+      schema:
+        type: string
+    purchaseId:
+      name: id
+      in: path
+      description: The v4 UUID of a specific purchase
+      required: true
+      schema:
+        type: string
+    envelopeFromId:
+      name: from-id
+      in: path
+      description: >-
+        The v4 UUID of a specific envelope from which a balance will be
+        transferred
+      required: true
+      schema:
+        type: string
+    envelopeToId:
+      name: to-id
+      in: path
+      description: >-
+        The v4 UUID of a specific envelope to which a balance will be
+        transferred
+      required: true
+      schema:
+        type: string
+  responses:
+    400_invalid_v4UUID:
+      description: Bad Request
+      content:
+        text/plain; charset=utf-8:
+          examples:
+            Error:
+              value: 'Error: the ID 1234 is not a valid v4 UUID.'
+    404_not_found_batch:
+      description: Not Found
+      content:
+        text/plain; charset=utf-8:
+          examples:
+            Error:
+              value: 'Error: one or both of the requested entries do not exist.'
+    404_not_found:
+      description: Not Found
+      content:
+        text/plain; charset=utf-8:
+          examples:
+            Error:
+              value: 'Error: the requested entry does not exist.'
+    500_internal_server_error:
+      description: Internal Server Error
+      content:
+        text/plain; charset=utf-8:
+          examples:
+            Error:
+              value: 'Error: a description of some server error.'
