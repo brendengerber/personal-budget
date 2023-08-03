@@ -68,7 +68,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Response: JSON object containing the updated envelope
 
 ### Endpoint: Transfer Envelope Budget
-* Description: Updates two specified envelopes in the database by transfering a specified budget from one to another
+* Description: Updates two specified envelopes in the database by transferring a specified budget from one to another
 * Path: `/api/envelopes/{from-id}/transfer/{to-id}`
 * Method: `PUT`
 * Payload: JSON object `{"budget": xxxx.xx string}`
