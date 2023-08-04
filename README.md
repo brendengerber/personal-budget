@@ -30,7 +30,7 @@ This small api is based off of the envelope budgeting system. The concept is tha
 ---
 ## **Summary of API Specification**
 Interactive swagger documentation can also be found [here](https://brendengerber.github.io/personal-budget/)
-(note: swagger testing will not work propperly unless the server is hosted, it is currently linked to localhost:3000)
+(note: swagger testing will not work propperly unless the server is hosted, it is currently set up for localhost:3000)
 ### **1. ENVELOPES ENDPOINTS**
 ### Endpoint: Get All Envelopes
 * Description: Gets all of the envelopes from the database
