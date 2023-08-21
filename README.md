@@ -13,7 +13,6 @@ This small api is based off of the envelope budgeting system. The concept is tha
 ## **Features**
 
 ### 1. Built to scale. 
-
 * Moduler design allows new functionality to be added without affecting existing files.
 * Route functionality is kept in seperate middleware functions to maintain separation of concerns and allow for re use in multiple routes.
 * Helper functions are kept generic to allow for re-use by multiple modules for multiple purposes.
@@ -23,6 +22,9 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Generic functions use arguments to build dynamic queries which can be reused on any table regardless of columns.
 * Queries are paramaterized to prevent SQL injection.
 * Dynamic table and column names are escaped to prevent SQL injection.
+
+### 2. User inputs validated and sanitized
+* All user input is validated and sanitized before being used or storeed in order to prevent XSS 
 
 ### 3. Data stored in database. 
 * All data is stored in a PostgresSql database.
