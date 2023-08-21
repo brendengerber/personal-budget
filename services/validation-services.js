@@ -1,4 +1,4 @@
-//This file contains validation services that check that user submitted data conforms to app standards and return a sanatized version
+//This file contains services that validate user submitted data and return a sanatized version
 //They are kept separate not only to reuse, but also to separate functionality
 
 //Imports necessary modules
@@ -55,7 +55,7 @@ schemas = {
 };
 
 //Used to validate and sanatize data and standard objects
-const validate = {
+const check = {
     //Methods that validate a single piece of data and return a sanatized version
     data:{
         //Validates money values to ensure that they conforms to the xxxx.xx currency format and throws an error if not
@@ -119,14 +119,14 @@ const validate = {
             validationErrors = schemas.envelope.validate(envelope);
             //Sanitizes the category string
             try{
-                envelope.category = validate.data.string(envelope.category);
+                envelope.category = check.data.string(envelope.category);
             }catch(err){
                 validationErrors.push(err.message);
             }
-            //Sanitizes and checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
+            //Sanitizes and validates that the id is a valid v4 UUID if it exists and adds an error to the array if not
             try{
                 if(envelope.id){
-                    envelope.id = validate.data.id(envelope.id);
+                    envelope.id = check.data.id(envelope.id);
                 }
             }catch(err){
                 validationErrors.push(err.message);
@@ -144,16 +144,16 @@ const validate = {
             //Standardizes the envelope by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't yet exist
             try{
                 if(!envelope.id && id){
-                    envelope = {'id': validate.data.id(id), ...envelope};
+                    envelope = {'id': check.data.id(id), ...envelope};
                 }else{
                     envelope = {'id': undefined, ...envelope};
                 }
             }catch(err){
                 validationErrors.push(err.message);
             }
-            //Sanitizes and checks that the budget follows the xxxx.xx format and adds an error to the array if not
+            //Sanitizes and validates that the budget follows the xxxx.xx format and adds an error to the array if not
             try{
-                envelope.budget = validate.data.money(envelope.budget);
+                envelope.budget = check.data.money(envelope.budget);
             }catch(err){
                 validationErrors.push(err.message);
             }
@@ -175,14 +175,14 @@ const validate = {
             validationErrors = schemas.purchase.validate(purchase);
             //Sanitizes the description string
             try{
-                purchase.description = validate.data.string(purchase.description);
+                purchase.description = check.data.string(purchase.description);
             }catch(err){
                 validationErrors.push(err.message);
             }
-            //Sanitizes and checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
+            //Sanitizes and validates that the id is a valid v4 UUID if it exists and adds an error to the array if not
             try{
                 if(purchase.id){
-                    purchase.id = validate.data.id(purchase.id);
+                    purchase.id = check.data.id(purchase.id);
                 }
             }catch(err){
                 validationErrors.push(err.message);
@@ -200,28 +200,28 @@ const validate = {
             //Standardizes the purchase by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't yet exist
             try{
                 if(!purchase.id && id){
-                    purchase = {'id': validate.data.id(id), ...purchase};
+                    purchase = {'id': check.data.id(id), ...purchase};
                 }else{
                     purchase = {'id': undefined, ...purchase};
                 }
             }catch(err){
                 validationErrors.push(err.message);
             }
-            //Sanitizes and checks that the envelope_id is a valid v4 UUID and adds an error to the array if not
+            //Sanitizes and validates that the envelope_id is a valid v4 UUID and adds an error to the array if not
             try{
-                purchase.envelope_id = validate.data.id(purchase.envelope_id);
+                purchase.envelope_id = check.data.id(purchase.envelope_id);
             }catch(err){
                 validationErrors.push(err.message);
             }
-            //Sanitizes and checks that the date format is valid and adds an error to the array if not
+            //Sanitizes and validates that the date format is valid and adds an error to the array if not
             try{
-                purchase.date = validate.data.date(purchase.date)
+                purchase.date = check.data.date(purchase.date)
             }catch(err){
                 validationErrors.push(err.message)
             }
-            //Sanitizes and checks that the amount follows the xxxx.xx format and adds an error to the array if not
+            //Sanitizes and validates that the amount follows the xxxx.xx format and adds an error to the array if not
             try{ 
-                purchase.amount = validate.data.money(purchase.amount);
+                purchase.amount = check.data.money(purchase.amount);
             }catch(err){
                 validationErrors.push(err.message);
             }
@@ -241,9 +241,9 @@ const validate = {
             let validationErrors;
             //Validates the format of the budget and sets validationErrors equal to an array of errors if any
             validationErrors = schemas.budget.validate(budget);
-            //Checks that the budget follows the xxxx.xx format and adds an error to the array if not
+            //Sanitizes and validates that the budget follows the xxxx.xx format and adds an error to the array if not
             try{
-                budget.budget = validate.data.money(budget.budget);
+                budget.budget = check.data.money(budget.budget);
             }catch(err){
                 validationErrors.push(err.message);
             }
@@ -262,5 +262,5 @@ const validate = {
 
 //Exports to be used in other modules
 module.exports = {
-    validate
+    check
 };

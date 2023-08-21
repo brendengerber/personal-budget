@@ -1,13 +1,13 @@
 //Imports necessary modules
 const express = require('express');
-const {validateIdParam, validatePurchaseReq} = require('../custom-middleware/validation-middleware.js');
+const {checkParamId, checkReqPurchase} = require('../custom-middleware/validation-middleware.js');
 const {getAllPurchases, getPurchaseById, addPurchase, updatePurchaseById, deletePurchaseById} = require('../custom-middleware/purchases-database-middleware.js');
 
 //Creates the router
 const purchasesRouter = express.Router();
 
-//Validates all id parameters
-purchasesRouter.param('id', validateIdParam('purchaseId'));
+//Validates and sanitizes all id parameters
+purchasesRouter.param('id', checkParamId('purchaseId'));
 
 //Gets all purchase and sends them as an array
 purchasesRouter.get('/', getAllPurchases, (req, res, next) => {
@@ -21,7 +21,7 @@ purchasesRouter.get('/:id', getPurchaseById, (req, res, next) => {
 
 //Posts a new purchase and sends an array consiting of the new purchase with its newly assigned v4 UUID and the cooresponding envelope with its updated budget
 //Body must be the new purchase in the form of a JSON object: {"envelope_id": v4 UUID string, amount: xxxx.xx number}
-purchasesRouter.post('/', validatePurchaseReq, addPurchase, (req, res, next) => {
+purchasesRouter.post('/', checkReqPurchase, addPurchase, (req, res, next) => {
     res.status(201).send([req.purchase, req.envelope]);
 });
 
@@ -32,7 +32,7 @@ purchasesRouter.delete('/:id', deletePurchaseById, (req, res, next) => {
 
 //Updates a new purchase and sends an array consiting of the updated purchase and the cooresponding envelope with its updated budget
 //Body must be the new purchase in the form of a JSON object: {"id": v4 UUID string, "category": string, "budget": xxxx.xx number} or {"category": string, "budget": xxxx.xx number}
-purchasesRouter.put('/:id', validatePurchaseReq, updatePurchaseById, (req, res, next) => {
+purchasesRouter.put('/:id', checkReqPurchase, updatePurchaseById, (req, res, next) => {
     res.status(200).send([req.purchase, req.envelope]);
 });
 
