@@ -17,6 +17,7 @@
     "pg-promise": "^11.5.0",
     "promise": "^8.3.0",
     "validate": "^5.2.0",
-    "validator": "^13.9.0"
+    "validator": "^13.11.0",
+    "xss": "^1.0.14"
   }
 }

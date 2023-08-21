@@ -6,12 +6,12 @@ const validator = require('validator');
 const Schema = require('validate');
 
 //Validates money values to ensure that they conforms to the xxxx.xx currency format and throws an error if not
+//Ssanitizes input strings to prevent xss
 //Money with either 2, 1, or 0 decimals and no comma separators will validate
 //"money" is a string to validate
-
-const validateMoney = function(money){
+const validateMoney = function(money){    
     if(validator.isCurrency(money.toString(), {thousands_separator: '', digits_after_decimal: [0, 1, 2]})){
-        return money;
+        return validator.escape(money);
     }else{
         const err = new Error(`Error: the budget ${money} does not follow the xxxx.xx currency format.`);
         err.status = 400;
@@ -20,10 +20,11 @@ const validateMoney = function(money){
 };
 
 //Validates an id using a regular expression to ensure it conforms to the v4 UUID standard and throws an error if not
+//Ssanitizes input strings to prevent xss
 //"id" is a string to validate
 const validateId = function(id){
     if(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(id)){
-        return id;
+        return validator.escape(id);
     }else{
         const err = new Error(`Error: the ID ${id} is not a valid v4 UUID.`);
         err.status = 400;
@@ -32,16 +33,25 @@ const validateId = function(id){
 };
 
 //Validates date properties of submitted entries to ensure they conforms to the YYYY-MM-DD date format
+//Ssanitizes input strings to prevent xss
 //"date" is a string to validate
 const validateDate = function(date){
     if(validator.isDate(date, {format: 'YYYY-MM-DD', delimiters: ['-']})){
-        return date;
+        return validator.escape(date);
     }else{
         const err = new Error(`Error: the date ${date} does not follow the YYYY-MM-DD date format.`);
         err.status = 400;
         throw err;
     }
 };
+//Ssanitizes input strings to prevent xss
+const validateString = function(string){
+    try{
+        return validator.escape(string);
+    }catch(err){
+        return(err);
+    }
+}
 
 //Creates a schema to validate Envelope objects
 const envelopeSchema = new Schema({
@@ -69,10 +79,16 @@ const validateEnvelope = function(envelope, id){
     let validationErrors;
     //Validates the format of the envelope and sets validationErrors equal to an array of errors if any
     validationErrors = envelopeSchema.validate(envelope);
-    //Checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
+    //Sanitizes the category string
+    try{
+        envelope.category = validateString(envelope.category);
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Sanitizes and checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
     try{
         if(envelope.id){
-            validateId(envelope.id);
+            envelope.id = validateId(envelope.id);
         }
     }catch(err){
         validationErrors.push(err.message);
@@ -87,13 +103,19 @@ const validateEnvelope = function(envelope, id){
     if(envelope.id && !id){
         validationErrors.push('Error: there is an id mismatch.');
     }
-    //Standardizes the envelope by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't exist
-    if(!envelope.id){
-        envelope = {'id': id, ...envelope};
-    }
-    //Checks that the budget follows the xxxx.xx format and adds an error to the array if not
+    //Standardizes the envelope by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't yet exist
     try{
-        validateMoney(envelope.budget);
+        if(!envelope.id && id){
+            envelope = {'id': validateId(id), ...envelope};
+        }else{
+            envelope = {'id': undefined, ...envelope};
+        }
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Sanitizes and checks that the budget follows the xxxx.xx format and adds an error to the array if not
+    try{
+        envelope.budget = validateMoney(envelope.budget);
     }catch(err){
         validationErrors.push(err.message);
     }
@@ -124,7 +146,7 @@ const validateBudget = function (budget){
     validationErrors = budgetSchema.validate(budget);
     //Checks that the budget follows the xxxx.xx format and adds an error to the array if not
     try{
-        validateMoney(budget.budget);
+        budget.budget = validateMoney(budget.budget);
     }catch(err){
         validationErrors.push(err.message);
     }
@@ -169,10 +191,16 @@ const validatePurchase = function (purchase, id){
     let validationErrors;
     //Validates the format of the purchase and sets validationErrors equal to an array of errors if any
     validationErrors = purchaseSchema.validate(purchase);
-    //Checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
+    //Sanitizes the description string
+    try{
+        purchase.description = validateString(purchase.description);
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Sanitizes and checks that the id is a valid v4 UUID if it exists and adds an error to the array if not
     try{
         if(purchase.id){
-            validateId(purchase.id);
+            purchase.id = validateId(purchase.id);
         }
     }catch(err){
         validationErrors.push(err.message);
@@ -187,25 +215,31 @@ const validatePurchase = function (purchase, id){
     if(purchase.id && !id){
         validationErrors.push('Error: there is an id mismatch.');
     }
-    //Standardizes the purchase by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't exist
-    if(!purchase.id){
-        purchase = {'id': id, ...purchase};
-    }
-    //Checks that the envelope_id is a valid v4 UUID and adds an error to the array if not
+    //Standardizes the purchase by adding the id if not already included (i.e. from a parameter etc) or sets it to undefined if it doesn't yet exist
     try{
-        validateId(purchase.envelope_id);
+        if(!purchase.id && id){
+            purchase = {'id': validateId(id), ...purchase};
+        }else{
+            purchase = {'id': undefined, ...purchase};
+        }
     }catch(err){
         validationErrors.push(err.message);
     }
-    //Checks that the date format is valid and adds an error to the array if not
+    //Sanitizes and checks that the envelope_id is a valid v4 UUID and adds an error to the array if not
     try{
-        validateDate(purchase.date)
+        purchase.envelope_id = validateId(purchase.envelope_id);
+    }catch(err){
+        validationErrors.push(err.message);
+    }
+    //Sanitizes and checks that the date format is valid and adds an error to the array if not
+    try{
+        purchase.date = validateDate(purchase.date)
     }catch(err){
         validationErrors.push(err.message)
     }
-    //Checks that the amount follows the xxxx.xx format and adds an error to the array if not
-    try{
-        validateMoney(purchase.amount);
+    //Sanitizes and checks that the amount follows the xxxx.xx format and adds an error to the array if not
+    try{ 
+        purchase.amount = validateMoney(purchase.amount);
     }catch(err){
         validationErrors.push(err.message);
     }
@@ -225,6 +259,7 @@ module.exports = {
     validateMoney,
     validateId,
     validateDate,
+    validateString,
     validateEnvelope,
     validateBudget,
     validatePurchase
