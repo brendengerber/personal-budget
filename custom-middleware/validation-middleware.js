@@ -4,13 +4,13 @@
 //This will allow for consistency and for middleware down the chain to use the data knowing it is clean and properly formatted
 
 //Imports necessary modules
-const {validateId, validateEnvelope, validateBudget, validatePurchase} = require('../services/validation-services.js');
+const {validate} = require('../services/validation-services.js');
 
 //Validates the format of an envelope submitted in the req.body and attatches it to req.envelope
 //A valid envelope will conform to {id: v4 UUID string/undefined, category: string, budget: xxxx.xx number}
 const validateEnvelopeReq = (req, res, next) => {
     try{
-        req.envelope = validateEnvelope(req.body, req.envelopeId);
+        req.envelope = validate.objects.envelope(req.body, req.envelopeId);
         next();
     } catch(err){
        next(err);
@@ -24,7 +24,7 @@ const validateEnvelopeReq = (req, res, next) => {
 const validateIdParam = (customProperty) => {
     return (req, res, next, id) => {
         try{
-            req[customProperty] = validateId(id);
+            req[customProperty] = validate.data.id(id);
             next();
         }catch(err){
             next(err);
@@ -36,7 +36,7 @@ const validateIdParam = (customProperty) => {
 //A valid budget will conform to {budget: xxxx.xx number}
 const validateReqTransferBudget = (req, res, next) => {
     try{
-        req.transferBudget = validateBudget(req.body).budget;
+        req.transferBudget = validate.objects.budget(req.body).budget;
         next();
     }catch(err){
         next(err);
@@ -45,7 +45,7 @@ const validateReqTransferBudget = (req, res, next) => {
 
 const validatePurchaseReq = (req, res, next) => {
     try{
-        req.purchase = validatePurchase(req.body, req.purchaseId);
+        req.purchase = validate.objects.purchase(req.body, req.purchaseId);
         next();
     }catch(err){
         next(err);
