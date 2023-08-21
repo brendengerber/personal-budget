@@ -1,6 +1,6 @@
 //Imports necessary modules
 const express = require('express');
-const {checkReqEnvelope, checkParamId, checkReqTransferBudget} = require('../custom-middleware/validation-middleware.js');
+const {checkReqEnvelope, checkParamId, checkReqTransferBudget} = require('../custom-middleware/validation-and-sanitization-middleware.js');
 const {getAllEnvelopes, getEnvelopeById, getEnvelopePurchasesById, addEnvelope, updateEnvelopeById, deleteEnvelopeById, transferEnvelopeBudgetByIds} = require('../custom-middleware/envelopes-database-middleware.js');
 
 //Creates the router

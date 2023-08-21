@@ -1,6 +1,6 @@
 //Imports necessary modules
 const express = require('express');
-const {checkParamId, checkReqPurchase} = require('../custom-middleware/validation-middleware.js');
+const {checkParamId, checkReqPurchase} = require('../custom-middleware/validation-and-sanitization-middleware.js');
 const {getAllPurchases, getPurchaseById, addPurchase, updatePurchaseById, deletePurchaseById} = require('../custom-middleware/purchases-database-middleware.js');
 
 //Creates the router
