@@ -23,10 +23,10 @@ This small api is based off of the envelope budgeting system. The concept is tha
 * Queries are paramaterized to prevent SQL injection.
 * Dynamic table and column names are escaped to prevent SQL injection.
 
-### 2. User inputs validated and sanitized
+### 3. User inputs validated and sanitized
 * All user input is validated and sanitized before being used or storeed in order to prevent XSS 
 
-### 3. Data stored in database. 
+### 4. Data stored in database. 
 * All data is stored in a PostgresSql database.
 * New entries are auto-assigned a unique v4 UUID.
 ---
